@@ -8,8 +8,6 @@ key="$1"
 
 case $key in
     env)                    ENV_ONLY=true;          shift ;;
-    linux)                  LINUX_ONLY=true;          shift ;;
-    win)                    WINDOWS_ONLY=true;          shift ;;
     -f|--flags)             FLAGS="$2";             shift; shift ;;
     -t|--target)            BUILD_TARGET="$2";      shift; shift ;;
     -bv|--binutils-version) BINUTILS_VERSION="$2";  shift; shift ;;
@@ -40,14 +38,8 @@ function main {
     fi
     
     downloadSources
-    if [[ $WINDOWS_ONLY == true ]]; then
-        compileAll "windows"
-    fi
-    
-    if [[ $LINUX_ONLY == true ]]; then
-        compileAll "linux"
-    fi
-        
+    compileAll "windows"
+    compileAll "linux"
     if [[ -d "$BUILD_DIR/windows/output" ]]; then
         cd $BUILD_DIR/windows/output
         zip -r "${BUILD_DIR}/${BUILD_TARGET}-tools-windows.zip" *
@@ -141,15 +133,11 @@ function downloadSources {
     downloadAndExtract "binutils" $BINUTILS_VERSION
     downloadAndExtract "gcc" $GCC_VERSION "http://ftp.gnu.org/gnu/gcc/gcc-$GCC_VERSION/gcc-$GCC_VERSION.tar.gz"
     echoColor "        Downloading GCC prerequisites"
-    if [[ $LINUX_ONLY == true ]]; then
     cd ./linux/gcc-$GCC_VERSION
     ./contrib/download_prerequisites
-    fi
-    if [[ $WINDOWS_ONLY == true ]]; then
     cd $BUILD_DIR
     cd ./windows/gcc-$GCC_VERSION
     ./contrib/download_prerequisites
-    fi
     cd $BUILD_DIR
     downloadAndExtract "gdb" $GDB_VERSION
 }
@@ -169,7 +157,6 @@ function downloadAndExtract {
         fi
     fi
 
-    if [[ $LINUX_ONLY == true ]]; then
     mkdir -p linux
     cd linux
     if [ ! -d $name-$version ]; then
@@ -177,8 +164,6 @@ function downloadAndExtract {
         tar -xf ../$name-$version.tar.gz
     fi
     cd ..
-    fi
-    if [[ $WINDOWS_ONLY == true ]]; then
     mkdir -p windows
     cd windows
     if [ ! -d $name-$version ]; then
@@ -186,7 +171,6 @@ function downloadAndExtract {
         tar -xf ../$name-$version.tar.gz
     fi
     cd ..
-    fi
 }
 
 function compileAll {
