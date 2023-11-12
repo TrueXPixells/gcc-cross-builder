@@ -7,7 +7,6 @@ do
 key="$1"
 
 case $key in
-    env)                    ENV_ONLY=true;          shift ;;
     -f|--flags)             FLAGS="$2";             shift; shift ;;
     -t|--target)            BUILD_TARGET="$2";      shift; shift ;;
     -bv|--binutils-version) BINUTILS_VERSION="$2";  shift; shift ;;
@@ -22,7 +21,6 @@ export PATH="/opt/mxe/usr/bin:$BUILD_DIR/linux/output/bin:$BUILD_DIR/windows/out
 
 echo "BUILD_TARGET     = ${BUILD_TARGET}"
 echo "BUILD_DIR        = ${BUILD_DIR}"
-echo "ENV              = ${ENV_ONLY}"
 echo "BINUTILS_VERSION = ${BINUTILS_VERSION}"
 echo "GCC_VERSION      = ${GCC_VERSION}"
 echo "GDB_VERSION      = ${GDB_VERSION}"
@@ -30,13 +28,8 @@ echo "PATH             = ${PATH}"
 
 function main {
     installPackages
-    
-    if [[ $ENV_ONLY == true ]]; then
-        installMXE
-        echoColor "Successfully installed build environment. Exiting as 'env' only was specified"
-        return
-    fi
-    
+    installMXE
+    sudo rm -rf /var/lib/apt/lists rm -rf /opt/mxe/.ccache rm -rf /opt/mxe/pkg
     downloadSources
     compileAll "linux"
     compileAll "windows"
@@ -108,6 +101,7 @@ function installPackages {
         python3 python3-dev python-is-python3 python3-mako python3-pip
         )
     echoColor "Installing packages"
+    sudo apt-get update -y -qq
     for pkg in ${pkgList[@]}; do
         sudo -E DEBIAN_FRONTEND=noninteractive apt-get -qq install $pkg -y
     done
