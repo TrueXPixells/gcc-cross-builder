@@ -3,12 +3,12 @@ name: docker
 on:
   workflow_dispatch:
   push:
-    branches: [ "master" ]
+    branches: [ "main" ]
     paths:
       - Dockerfile
       - build.sh
   pull_request:
-    branches: [ "master" ]
+    branches: [ "main" ]
     paths:
       - Dockerfile
       - build.sh
