@@ -38,8 +38,8 @@ function main {
     fi
     
     downloadSources
-    compileAll "windows"
     compileAll "linux"
+    compileAll "windows"
     if [[ -d "$BUILD_DIR/windows/output" ]]; then
         cd $BUILD_DIR/windows/output
         zip -r "${BUILD_DIR}/${BUILD_TARGET}-tools-windows.zip" *
