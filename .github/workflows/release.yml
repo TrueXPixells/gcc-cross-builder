@@ -1,0 +1,45 @@
+name: release
+
+on:
+  workflow_dispatch:
+    inputs:
+      gcc_version:
+        required: true
+        type: string
+      binutils_version:
+        required: true
+        type: string
+      gdb_version:
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [i386-elf, i686-elf, x86_64-elf, aarch64-elf, riscv64-elf, arm-none-eabi, riscv64-softfloat]
+        platform: [win, linux]
+    name: ${{ matrix.arch }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: |         
+          docker run -v "${{ github.workspace }}:/root" --rm truexpixels/elf-tools ${{ matrix.platform }} -t "${{ matrix.arch }}" -gv ${{ inputs.gcc_version }} -bv ${{ inputs.binutils_version }} -dv ${{ inputs.gdb_version }}
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.arch }}
+          path: ${{ github.workspace }}/build-*/*.zip
+  release:
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: ${{ always() }}
+    steps:
+    - uses: actions/download-artifact@v3
+    - name: release
+      uses: softprops/action-gh-release@v0.1.15
+      with:
+        name: GCC ${{ inputs.gcc_version }} Binutils ${{ inputs.binutils_version }} GDB ${{ inputs.gdb_version }}
+        tag_name: ${{ inputs.gcc_version }}
+        files: '**/*.zip'
