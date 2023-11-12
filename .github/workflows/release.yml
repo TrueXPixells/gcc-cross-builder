@@ -21,7 +21,7 @@ jobs:
       matrix:
         arch: [i386-elf, i686-elf, x86_64-elf, aarch64-elf, riscv64-elf, arm-none-eabi, riscv64-softfloat]
         platform: [win, linux]
-    name: ${{ matrix.arch }}
+    name: ${{ matrix.arch }}-${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
       - name: Build
