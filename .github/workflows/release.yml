@@ -28,7 +28,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Build
         run: |
-          cd $GITHUB_WORKSPACE -t "${{ matrix.arch }}" -gv ${{ inputs.gcc_version }} -bv ${{ inputs.binutils_version }} -dv ${{ inputs.gdb_version }}
+          cd $GITHUB_WORKSPACE 
+          ./build.sh -t "${{ matrix.arch }}" -gv ${{ inputs.gcc_version }} -bv ${{ inputs.binutils_version }} -dv ${{ inputs.gdb_version }}
       - uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.arch }}
