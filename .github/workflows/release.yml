@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [i386-elf, i686-elf, x86_64-elf, aarch64-elf, riscv64-elf, arm-none-eabi, riscv64-softfloat]
+        arch: [i386-elf, i686-elf, x86_64-elf, aarch64-elf, riscv64-elf, arm-none-eabi]
     name: ${{ matrix.arch }}
     steps:
       - uses: actions/checkout@v4
