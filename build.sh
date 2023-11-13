@@ -7,7 +7,6 @@ do
 key="$1"
 
 case $key in
-    -f|--flags)             FLAGS="$2";             shift; shift ;;
     -t|--target)            BUILD_TARGET="$2";      shift; shift ;;
     -bv|--binutils-version) BINUTILS_VERSION="$2";  shift; shift ;;
     -gv|--gcc-version)      GCC_VERSION="$2";       shift; shift ;;
@@ -181,20 +180,9 @@ function compileBinutils {
     echoColor "    Compiling binutils [$1]"
     mkdir -p build-binutils-$BINUTILS_VERSION
     cd build-binutils-$BINUTILS_VERSION
-    configureArgs="CFLAGS=$FLAGS CXXFLAGS=$FLAGS --with-sysroot --disable-nls --disable-werror --enable-targets=x86_64-pep --prefix=$BUILD_DIR/$1/output"
+    configureArgs="--target=$BUILD_TARGET --with-sysroot --disable-nls --disable-werror --enable-targets=x86_64-pep --prefix=$BUILD_DIR/$1/output"
     if [ $1 == "windows" ]; then
         configureArgs="--host=i686-w64-mingw32.static $configureArgs"
-    fi
-    RISCV_FLAGS="-mno-relax"
-    RISCV_SOFT_FLAGS="-march=rv64imac_zicsr_zifencei -mabi=lp64 $RISCV_FLAGS"
-    if [ $BUILD_TARGET == "riscv64-softfloat" ]; then
-        configureArgs="CFLAGS=$RISCV_SOFT_FLAGS CXXFLAGS=$RISCV_SOFT_FLAGS --target=riscv64-elf $configureArgs"
-    else
-        if [ $BUILD_TARGET == "riscv64-elf"]; then
-            configureArgs="CFLAGS=$RISCV_FLAGS CXXFLAGS=$RISCV_FLAGS --target=$BUILD_TARGET $configureArgs"
-        else
-            configureArgs="--target=$BUILD_TARGET $configureArgs"
-        fi
     fi
     ../binutils-$BINUTILS_VERSION/configure $configureArgs
     make -j12
@@ -206,20 +194,9 @@ function compileGCC {
     echoColor "    Compiling gcc [$1]"
     mkdir -p build-gcc-$GCC_VERSION
     cd build-gcc-$GCC_VERSION
-    configureArgs="CFLAGS=$FLAGS CXXFLAGS=$FLAGS --target=${BUILD_TARGET} --disable-nls --enable-languages=c,c++ --without-headers --prefix=$BUILD_DIR/$1/output"
+    configureArgs="--target=$BUILD_TARGET --disable-nls --enable-languages=c,c++ --without-headers --prefix=$BUILD_DIR/$1/output"
     if [ $1 == "windows" ]; then
         configureArgs="--host=i686-w64-mingw32.static $configureArgs"
-    fi
-    RISCV_FLAGS="-mno-relax"
-    RISCV_SOFT_FLAGS="-march=rv64imac_zicsr_zifencei -mabi=lp64 $RISCV_FLAGS"
-    if [ $BUILD_TARGET == "riscv64-softfloat" ]; then
-        configureArgs="CFLAGS=$RISCV_SOFT_FLAGS CXXFLAGS=$RISCV_SOFT_FLAGS --target=riscv64-elf $configureArgs"
-    else
-        if [ $BUILD_TARGET == "riscv64-elf"]; then
-            configureArgs="CFLAGS=$RISCV_FLAGS CXXFLAGS=$RISCV_FLAGS --target=$BUILD_TARGET $configureArgs"
-        else
-            configureArgs="--target=$BUILD_TARGET $configureArgs"
-        fi
     fi
     if [[ $BUILD_TARGET == "x86_64-elf" ]]; then
         echoColor "        Installing config/i386/t-x86_64-elf"
@@ -250,20 +227,9 @@ function compileGCC {
 
 function compileGDB {
     echoColor "    Compiling gdb [$1]"
-    configureArgs="CFLAGS=$FLAGS CXXFLAGS=$FLAGS --target=${BUILD_TARGET} --disable-nls --disable-werror --prefix=$BUILD_DIR/$1/output"
+    configureArgs="--target=$BUILD_TARGET --disable-nls --disable-werror --prefix=$BUILD_DIR/$1/output"
     if [ $1 == "windows" ]; then
         configureArgs="--host=i686-w64-mingw32.static $configureArgs"
-    fi
-    RISCV_FLAGS="-mno-relax"
-    RISCV_SOFT_FLAGS="-march=rv64imac_zicsr_zifencei -mabi=lp64 $RISCV_FLAGS"
-    if [ $BUILD_TARGET == "riscv64-softfloat" ]; then
-        configureArgs="CFLAGS=$RISCV_SOFT_FLAGS CXXFLAGS=$RISCV_SOFT_FLAGS --target=riscv64-elf $configureArgs"
-    else
-        if [ $BUILD_TARGET == "riscv64-elf"]; then
-            configureArgs="CFLAGS=$RISCV_FLAGS CXXFLAGS=$RISCV_FLAGS --target=$BUILD_TARGET $configureArgs"
-        else
-            configureArgs="--target=$BUILD_TARGET $configureArgs"
-        fi
     fi
     mkdir -p build-gdb-$GDB_VERSION
     cd build-gdb-$GDB_VERSION
