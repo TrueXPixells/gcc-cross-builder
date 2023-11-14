@@ -28,7 +28,7 @@ echo "PATH             = ${PATH}"
 function main {
     installPackages
     installMXE
-    sudo rm -rf /var/lib/apt/lists rm -rf /opt/mxe/.ccache rm -rf /opt/mxe/pkg
+    sudo rm -rf /var/lib/apt/lists /opt/mxe/.ccache /opt/mxe/pkg
     downloadSources
     compileAll "linux"
     compileAll "windows"
@@ -180,7 +180,16 @@ function compileBinutils {
     echoColor "    Compiling binutils [$1]"
     mkdir -p build-binutils-$BINUTILS_VERSION
     cd build-binutils-$BINUTILS_VERSION
-    configureArgs="--target=$BUILD_TARGET --with-sysroot --disable-nls --disable-werror --enable-targets=x86_64-pep --prefix=$BUILD_DIR/$1/output"
+    configureArgs="--target=$BUILD_TARGET --with-sysroot --disable-nls --disable-werror --prefix=$BUILD_DIR/$1/output"
+    if [[ $BUILD_TARGET == "i386-elf" || $BUILD_TARGET == "i686-elf" || $BUILD_TARGET == "x86_64-elf" ]]; then
+        configureArgs="--enable-targets=x86_64-pep $configureArgs"
+    fi
+    if [ $BUILD_TARGET == "aarch64-elf" ]; then
+        configureArgs="--enable-targets=aarch64-pe $configureArgs"
+    fi
+    if [ $BUILD_TARGET == "arm-none-eabi" ]; then
+        configureArgs="--enable-targets=arm-pe $configureArgs"
+    fi
     if [ $1 == "windows" ]; then
         configureArgs="--host=i686-w64-mingw32.static $configureArgs"
     fi
