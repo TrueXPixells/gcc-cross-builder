@@ -107,6 +107,7 @@ function installPackages {
         )
     echoColor "Installing packages"
     sudo apt-get update -y -qq
+    sudo apt-get upgrade -y -qq
     for pkg in ${pkgList[@]}; do
         sudo -E DEBIAN_FRONTEND=noninteractive apt-get -qq install $pkg -y
     done
