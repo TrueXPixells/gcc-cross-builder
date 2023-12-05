@@ -93,6 +93,8 @@ function installPackages {
         
         build-essential
         sudo
+        texinfo
+        makeinfo
 
 
 
