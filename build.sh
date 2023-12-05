@@ -7,6 +7,7 @@ do
 key="$1"
 
 case $key in
+    env)                    ENV_ONLY=true;          shift;;
     -t|--target)            BUILD_TARGET="$2";      shift; shift ;;
     -bv|--binutils-version) BINUTILS_VERSION="$2";  shift; shift ;;
     -gv|--gcc-version)      GCC_VERSION="$2";       shift; shift ;;
@@ -20,6 +21,7 @@ export PATH="/opt/mxe/usr/bin:$BUILD_DIR/linux/output/bin:$BUILD_DIR/windows/out
 
 echo "BUILD_TARGET     = ${BUILD_TARGET}"
 echo "BUILD_DIR        = ${BUILD_DIR}"
+echo "ENV = ${ENV_ONLY}"
 echo "BINUTILS_VERSION = ${BINUTILS_VERSION}"
 echo "GCC_VERSION      = ${GCC_VERSION}"
 echo "GDB_VERSION      = ${GDB_VERSION}"
@@ -29,6 +31,10 @@ function main {
     installPackages
     installMXE
     sudo rm -rf /var/lib/apt/lists /opt/mxe/.ccache /opt/mxe/pkg
+    if [[ $ENV_ONLY == true ]]; then
+        echoColor "Successfully installed build environment. Exiting as 'env' only was specified"
+        return
+    fi
     downloadSources
     compileAll "linux"
     compileAll "windows"
