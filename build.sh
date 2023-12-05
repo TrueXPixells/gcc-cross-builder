@@ -50,60 +50,75 @@ function main {
 }
 function installPackages {
     pkgList=(
-        git
         autoconf
         automake
         autopoint
-        autotools-dev
         bash
-        curl
         bison
         bzip2
         flex
-        gettext
         git
         g++
+        g++-multilib
+        gettext
+        git
         gperf
         intltool
-        libffi-dev
+        libc6-dev-i386
         libgdk-pixbuf2.0-dev
-        libgmp-dev
-        libtool
         libltdl-dev
+        libgl-dev
+        libpcre3-dev
         libssl-dev
+        libtool-bin
         libxml-parser-perl
-        libipt-dev
-        libdebuginfod-dev
-        libmpc-dev
-        patchutils
-        bc
-        zlib1g-dev
-        libmpfr-dev
-        gawk 
-        build-essential
+        lzip
         make
-        sudo
         openssl
         p7zip-full
         patch
-        ninja-build
-        cmake
-        libglib2.0-dev
-        perl
-        pkg-config
+        perl 
+        python3 
+        python3-distutils
+        python3-mako 
+        python3-pkg-resources
+        python-is-python3 
         ruby
-        scons
         sed
         unzip
         wget
         xz-utils
-        libtool-bin
-        texinfo
-        g++-multilib
-        lzip
-        babeltrace
-        libexpat-dev
-        python3 python3-dev python-is-python3 python3-mako python3-pip
+
+
+        
+        build-essential
+        sudo
+
+
+
+        # Binutils
+        
+        # GCC
+        gawk
+        binutils
+        gzip
+        tar
+        perl
+        libgmp-dev
+        libmpfr-dev
+        libmpc-dev
+        libisl-dev
+        zstd
+        libzstd-dev
+        gettext
+        # GDB
+        libgmp-dev
+        libmpfr-dev
+        guile-3.0-dev
+        libexpat1-dev
+        
+        liblzma-dev
+        zlib1g-dev
         )
     echoColor "Installing packages"
     sudo apt-get update -y -qq
