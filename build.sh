@@ -9,7 +9,6 @@ key="$1"
 case $key in
     env)                    ENV_ONLY=true;          shift;;
     -t|--target)            BUILD_TARGET="$2";      shift; shift ;;
-    -m|--mcmodel)           MCMODEL_TYPE="$2";      shift; shift ;;
     -bv|--binutils-version) BINUTILS_VERSION="$2";  shift; shift ;;
     -gv|--gcc-version)      GCC_VERSION="$2";       shift; shift ;;
     -dv|--gdb-version)      GDB_VERSION="$2";       shift; shift ;;
@@ -240,14 +239,9 @@ function compileGCC {
     ../gcc-$GCC_VERSION/configure $configureArgs
     make -j12 all-gcc
     if [[ $BUILD_TARGET == "x86_64-elf" ]]; then
-    if [ $MCMODEL_TYPE = "large" ]; then
         make -j12 all-target-libgcc CFLAGS_FOR_TARGET='-g -O2 -mcmodel=large -mno-red-zone'
-    fi
-    if [ $MCMODEL_TYPE = "kernel" ]; then
-        make all-target-libgcc CFLAGS_FOR_TARGET='-g -O2 -mcmodel=kernel -mno-red-zone' || true
-        sed -i 's/PICFLAG/DISABLED_PICFLAG/g' $BUILD_TARGET/libgcc/Makefile
-        make all-target-libgcc CFLAGS_FOR_TARGET='-g -O2 -mcmodel=kernel -mno-red-zone'
-    fi
+    else
+        make -j12 all-target-libgcc
     fi
     sudo make -j12 install-gcc
     sudo make install-target-libgcc
