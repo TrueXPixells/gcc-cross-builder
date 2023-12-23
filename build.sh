@@ -9,6 +9,7 @@ key="$1"
 case $key in
     env)                    ENV_ONLY=true;          shift;;
     -t|--target)            BUILD_TARGET="$2";      shift; shift ;;
+    -m|--mcmodel)           MCMODEL_TYPE="$2";      shift; shift ;;
     -bv|--binutils-version) BINUTILS_VERSION="$2";  shift; shift ;;
     -gv|--gcc-version)      GCC_VERSION="$2";       shift; shift ;;
     -dv|--gdb-version)      GDB_VERSION="$2";       shift; shift ;;
@@ -232,14 +233,23 @@ function compileGCC {
     fi
     if [[ $BUILD_TARGET == "x86_64-elf" ]]; then
         echoColor "        Installing config/i386/t-x86_64-elf"
-        echo -e "# Add libgcc multilib variant without red-zone requirement\n\nMULTILIB_OPTIONS += mno-red-zone\nMULTILIB_DIRNAMES += no-red-zone" > ../gcc-$GCC_VERSION/gcc/config/i386/t-x86_64-elf
+        echo -e "MULTILIB_OPTIONS += mno-red-zone\nMULTILIB_DIRNAMES += no-red-zone" > ../gcc-$GCC_VERSION/gcc/config/i386/t-x86_64-elf
         echoColor "        Patching gcc/config.gcc"
         sed -i '/x86_64-\*-elf\*)/a \\ttmake_file="${tmake_file} i386/t-x86_64-elf" # include the new multilib configuration' ../gcc-$GCC_VERSION/gcc/config.gcc
     fi
     ../gcc-$GCC_VERSION/configure $configureArgs
     make -j12 all-gcc
+    if [[ $BUILD_TARGET == "x86_64-elf" ]]; then
+    if [ $MCMODEL_TYPE = "large" ]; then
+        make -j12 all-target-libgcc CFLAGS_FOR_TARGET='-g -O2 -mcmodel=large -mno-red-zone'
+    fi
+    if [ $MCMODEL_TYPE = "kernel" ]; then
+        make all-target-libgcc CFLAGS_FOR_TARGET='-g -O2 -mcmodel=kernel -mno-red-zone' || true
+        sed -i 's/PICFLAG/DISABLED_PICFLAG/g' $BUILD_TARGET/libgcc/Makefile
+        make all-target-libgcc CFLAGS_FOR_TARGET='-g -O2 -mcmodel=kernel -mno-red-zone'
+    fi
+    fi
     sudo make -j12 install-gcc
-    make -j12 all-target-libgcc
     sudo make install-target-libgcc
     if [[ $BUILD_TARGET == "x86_64-elf" ]]; then
         if [ $1 == "windows" ]; then
