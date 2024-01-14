@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -e
 
@@ -94,32 +94,24 @@ function installPackages {
         build-essential
         sudo
         texinfo
-
-
-
-        # Binutils
         
         # GCC
-        gawk
-        binutils
-        gzip
-        tar
-        perl
-        libgmp-dev
-        libmpfr-dev
-        libmpc-dev
-        libisl-dev
-        zstd
-        libzstd-dev
-        gettext
+        #gawk
+        #binutils
+        #gzip
+        #tar
+        #perl
+        #libmpc-dev
+        #libisl-dev
+        #zstd
+        #libzstd-dev
+        #gettext
         # GDB
-        libgmp-dev
-        libmpfr-dev
-        guile-3.0-dev
-        libexpat1-dev
+        #guile-3.0-dev
+        #libexpat1-dev
         
-        liblzma-dev
-        zlib1g-dev
+        #liblzma-dev
+        #zlib1g-dev
         )
     echoColor "Installing packages"
     sudo apt-get update -y -qq
