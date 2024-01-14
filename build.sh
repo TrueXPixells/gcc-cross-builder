@@ -16,11 +16,9 @@ case $key in
 esac
 done
 
-BUILD_DIR="$HOME/build-${BUILD_TARGET}"
-export PATH="/opt/mxe/usr/bin:$BUILD_DIR/linux/output/bin:$BUILD_DIR/windows/output/bin:$PATH"
+export PATH="/opt/mxe/usr/bin:$HOME-$BUILD_TARGET/linux/output/bin:$HOME-$BUILD_TARGET/windows/output/bin:$PATH"
 
 echo "BUILD_TARGET     = ${BUILD_TARGET}"
-echo "BUILD_DIR        = ${BUILD_DIR}"
 echo "ENV = ${ENV_ONLY}"
 echo "BINUTILS_VERSION = ${BINUTILS_VERSION}"
 echo "GCC_VERSION      = ${GCC_VERSION}"
@@ -31,6 +29,7 @@ function main {
     installPackages
     installMXE
     sudo rm -rf /var/lib/apt/lists /opt/mxe/.ccache /opt/mxe/pkg
+    sudo ls -a /opt/mxe
     if [[ $ENV_ONLY == true ]]; then
         echoColor "Successfully installed build environment. Exiting as 'env' only was specified"
         return
@@ -38,15 +37,7 @@ function main {
     downloadSources
     compileAll "linux"
     compileAll "windows"
-    if [[ -d "$BUILD_DIR/windows/output" ]]; then
-        cd $BUILD_DIR/windows/output
-        zip -r "${BUILD_DIR}/${BUILD_TARGET}-tools-windows.zip" *
-    fi
-    if [[ -d "$BUILD_DIR/linux/output" ]]; then
-        cd $BUILD_DIR/linux/output
-        zip -r "${BUILD_DIR}/${BUILD_TARGET}-tools-linux.zip" *
-    fi
-    echo -e "\e[92mZipped everything to $BUILD_DIR/${BUILD_TARGET}-tools-[windows | linux].zip\e[39m"
+    echo -e "\e[92mZipped everything to $HOME/${BUILD_TARGET}-tools-[windows | linux].zip\e[39m"
 }
 function installPackages {
     pkgList=(
@@ -135,19 +126,17 @@ function installMXE {
 }
 
 function downloadSources {
-    mkdir -p $BUILD_DIR
-    cd $BUILD_DIR
+    cd $HOME
     echoColor "Downloading all sources"
     downloadAndExtract "binutils" $BINUTILS_VERSION
     downloadAndExtract "gcc" $GCC_VERSION "http://ftp.gnu.org/gnu/gcc/gcc-$GCC_VERSION/gcc-$GCC_VERSION.tar.gz"
-    echoColor "        Downloading GCC prerequisites"
-    cd ./linux/gcc-$GCC_VERSION
-    ./contrib/download_prerequisites
-    cd $BUILD_DIR
-    cd ./windows/gcc-$GCC_VERSION
-    ./contrib/download_prerequisites
-    cd $BUILD_DIR
     downloadAndExtract "gdb" $GDB_VERSION
+    echoColor "        Downloading GCC prerequisites"
+    cd ./linux-$BUILD_TARGET/gcc-$GCC_VERSION
+    ./contrib/download_prerequisites
+    cd ../..
+    cd ./windows-$BUILD_TARGET/gcc-$GCC_VERSION
+    ./contrib/download_prerequisites
 }
 
 function downloadAndExtract {
@@ -165,15 +154,15 @@ function downloadAndExtract {
         fi
     fi
 
-    mkdir -p linux
-    cd linux
+    mkdir -p linux-$BUILD_TARGET
+    cd linux-$BUILD_TARGET
     if [ ! -d $name-$version ]; then
         echoColor "        [linux]   Extracting $name-$version.tar.gz"
         tar -xf ../$name-$version.tar.gz
     fi
     cd ..
-    mkdir -p windows
-    cd windows
+    mkdir -p windows-$BUILD_TARGET
+    cd windows-$BUILD_TARGET
     if [ ! -d $name-$version ]; then
         echoColor "        [windows] Extracting $name-$version.tar.gz"
         tar -xf ../$name-$version.tar.gz
@@ -183,19 +172,27 @@ function downloadAndExtract {
 
 function compileAll {
     echoColor "Compiling all $1"
-    cd $1
+    cd $1-$BUILD_TARGET
     mkdir -p output
-    compileBinutils $1
-    compileGCC $1
-    compileGDB $1
+
+    compile binutils $BINUTILS_VERSION $1
+    compile gcc $GCC_VERSION $1
+    compile gdb $GDB_VERSION $1
     cd ..
+    if [[ -d "$HOME/$1-$BUILD_TARGET/output" ]]; then
+        cd $HOME/$1-$BUILD_TARGET/output
+        zip -r "$HOME/${BUILD_TARGET}-tools-$1.zip" *
+    fi
+    rm -rf $HOME/$1-$BUILD_TARGET
 }
 
-function compileBinutils {    
-    echoColor "    Compiling binutils [$1]"
-    mkdir -p build-binutils-$BINUTILS_VERSION
-    cd build-binutils-$BINUTILS_VERSION
-    configureArgs="--target=$BUILD_TARGET --with-sysroot --disable-nls --disable-werror --prefix=$BUILD_DIR/$1/output"
+function compile {
+    echoColor "    Compiling $1 [$3-$BUILD_TARGET]"
+    mkdir -p build-$1-$2
+    cd build-$1-$2
+    configureArgs="--target=$BUILD_TARGET --with-sysroot --disable-nls --disable-werror --prefix=$HOME/$1-$BUILD_TARGET/output"
+    
+    if [ $1 == "binutils" ]; then
     if [[ $BUILD_TARGET == "i386-elf" || $BUILD_TARGET == "i686-elf" || $BUILD_TARGET == "x86_64-elf" ]]; then
         configureArgs="--enable-targets=x86_64-pep $configureArgs"
     fi
@@ -205,65 +202,52 @@ function compileBinutils {
     if [ $BUILD_TARGET == "arm-none-eabi" ]; then
         configureArgs="--enable-targets=arm-pe $configureArgs"
     fi
-    if [ $1 == "windows" ]; then
-        configureArgs="--host=i686-w64-mingw32.static $configureArgs"
     fi
-    ../binutils-$BINUTILS_VERSION/configure $configureArgs
-    make -j12
-    sudo make install
-    cd ..
-}
 
-function compileGCC {
-    echoColor "    Compiling gcc [$1]"
-    mkdir -p build-gcc-$GCC_VERSION
-    cd build-gcc-$GCC_VERSION
-    configureArgs="--target=$BUILD_TARGET --disable-nls --enable-languages=c,c++ --without-headers --prefix=$BUILD_DIR/$1/output"
-    if [ $1 == "windows" ]; then
+    if [ $3 == "windows" ]; then
         configureArgs="--host=i686-w64-mingw32.static $configureArgs"
     fi
-    if [[ $BUILD_TARGET == "x86_64-elf" ]]; then
+    
+    if [[ $1 == "gcc" || $BUILD_TARGET == "x86_64-elf" ]]; then
         echoColor "        Installing config/i386/t-x86_64-elf"
         echo -e "MULTILIB_OPTIONS += mno-red-zone\nMULTILIB_DIRNAMES += no-red-zone" > ../gcc-$GCC_VERSION/gcc/config/i386/t-x86_64-elf
         echoColor "        Patching gcc/config.gcc"
         sed -i '/x86_64-\*-elf\*)/a \\ttmake_file="${tmake_file} i386/t-x86_64-elf" # include the new multilib configuration' ../gcc-$GCC_VERSION/gcc/config.gcc
     fi
-    ../gcc-$GCC_VERSION/configure $configureArgs
-    make -j12 all-gcc
-    if [[ $BUILD_TARGET == "x86_64-elf" ]]; then
+
+    ../$1-$2/configure $configureArgs
+    if [ $1 == "gcc" ]; then
+        make -j12 all-gcc
+    else
+        make -j12
+    fi
+
+    if [[ $1 == "gcc" || $BUILD_TARGET == "x86_64-elf" ]]; then
         make -j12 all-target-libgcc CFLAGS_FOR_TARGET='-g -O2 -mcmodel=large -mno-red-zone'
     else
         make -j12 all-target-libgcc
     fi
+
+    if [[ $1 == "gcc" ]]; then
     sudo make -j12 install-gcc
     sudo make install-target-libgcc
-    if [[ $BUILD_TARGET == "x86_64-elf" ]]; then
-        if [ $1 == "windows" ]; then
+    else
+    sudo make install
+    fi
+    
+    if [[ $1 == "gcc" || $BUILD_TARGET == "x86_64-elf" ]]; then
+        if [ $3 == "windows" ]; then
             cd "${BUILD_TARGET}/no-red-zone/libgcc"
             sudo make install
             cd ../../..
         fi
-        if [[ ! -d "../output/lib/gcc/x86_64-elf/$GCC_VERSION/no-red-zone" ]]; then
+        if [[ ! -d "../output/lib/gcc/x86_64-elf/$2/no-red-zone" ]]; then
             echoError "ERROR: no-red-zone was not created. x64 patching failed"
             exit 1
         else
             echoColor "            Successfully compiled for no-red-zone"
         fi
     fi
-    cd ..
-}
-
-function compileGDB {
-    echoColor "    Compiling gdb [$1]"
-    configureArgs="--target=$BUILD_TARGET --disable-nls --disable-werror --prefix=$BUILD_DIR/$1/output"
-    if [ $1 == "windows" ]; then
-        configureArgs="--host=i686-w64-mingw32.static $configureArgs"
-    fi
-    mkdir -p build-gdb-$GDB_VERSION
-    cd build-gdb-$GDB_VERSION
-    ../gdb-$GDB_VERSION/configure $configureArgs
-    make -j12
-    sudo make install
     cd ..
 }
 
