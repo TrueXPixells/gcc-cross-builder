@@ -29,7 +29,7 @@ function main {
     installPackages
     installMXE
     sudo rm -rf /var/lib/apt/lists /opt/mxe/.ccache /opt/mxe/pkg
-    sudo ls -a /opt/mxe
+    sudo find /opt/mxe
     if [[ $ENV_ONLY == true ]]; then
         echoColor "Successfully installed build environment. Exiting as 'env' only was specified"
         return
@@ -98,11 +98,15 @@ function installPackages {
         #libzstd-dev
         #gettext
         # GDB
-        #guile-3.0-dev
-        #libexpat1-dev
+        libgmp-dev
+        libgmp10
+        libmpfr-dev
+        libmpfr6
+        guile-3.0-dev
+        libexpat1-dev
         
-        #liblzma-dev
-        #zlib1g-dev
+        liblzma-dev
+        zlib1g-dev
         )
     echoColor "Installing packages"
     sudo apt-get update -y -qq
