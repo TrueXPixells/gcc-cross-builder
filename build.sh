@@ -52,8 +52,8 @@ function main {
 }
 
 function installPackagesMac {
-    brew update
-    brew upgrade
+#    brew update
+#    brew upgrade
     brew install autoconf automake bison bzip2 flex gettext gperf intltool gdk-pixbuf pcre openssl libtool lzip make p7zip gnu-sed unzip xz texinfo libmpc isl gmp mpfr guile expat zlib gawk gzip
 }
 
