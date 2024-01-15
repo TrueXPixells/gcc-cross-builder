@@ -52,48 +52,14 @@ function main {
 }
 
 function installPackagesMac {
-    pkgList=(
-        autoconf 
-        automake
-        bash
-        bison
-        bzip2
-        flex
-        git
-        #g++
-        #g++-multilib
-        gettext
-        gperf
-        intltool
-        #libc6-dev-i386
-        gdk-pixbuf
-        #libltdl-dev
-        #libgl-dev
-        pcre
-        openssl
-        libtool #
-        #libxml-parser-perl
-        lzip
-        make
-        p7zip
-        perl
-    )
-
     brew update
     brew upgrade
+    brew install autoconf automake bison bzip2 flex gettext gperf intltool gdk-pixbuf pcre openssl libtool lzip make p7zip gnu-sed unzip xz texinfo libmpc isl gmp mpfr guile expat zlib gawk gzip
 }
 
 function installPackages {
     pkgList=(
-        autoconf
-        automake
         autopoint
-        bash
-        bison
-        bzip2
-        flex
-        git
-        g++
         g++-multilib
         gettext
         git
@@ -104,43 +70,20 @@ function installPackages {
         libltdl-dev
         libgl-dev
         libpcre3-dev
-        libssl-dev
-        libtool-bin
         libxml-parser-perl
         lzip
-        make
-        openssl
-        p7zip-full
-        patch
-        perl 
-        python3 
         python3-distutils
         python3-mako 
         python3-pkg-resources
-        python-is-python3 
-        ruby
         sed
-        unzip
-        wget
-        xz-utils
-
-
         
         build-essential
-        sudo
-        texinfo
         
         # GCC
         #gawk
-        #binutils
         #gzip
-        #tar
-        #perl
-        #libmpc-dev
-        #libisl-dev
-        #zstd
-        #libzstd-dev
-        #gettext
+        libmpc-dev
+        libisl-dev
         # GDB
         libgmp-dev
         libgmp10
@@ -153,11 +96,9 @@ function installPackages {
         zlib1g-dev
         )
     echoColor "Installing packages"
-    sudo apt-get update -y -qq
-    sudo apt-get upgrade -y -qq
-    for pkg in ${pkgList[@]}; do
-        sudo -E DEBIAN_FRONTEND=noninteractive apt-get -qq install $pkg -y
-    done
+    sudo apt-get update -y
+    sudo apt-get upgrade -y
+    sudo -E DEBIAN_FRONTEND=noninteractive apt-get  install $pkgList -y
 }
 
 function installMXE {
