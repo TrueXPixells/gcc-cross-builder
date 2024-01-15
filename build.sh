@@ -162,13 +162,13 @@ function installPackages {
 
 function installMXE {
     echoColor "Installing MXE"
-    if [ ! -d "$HOME/mxe/usr/bin" ]; then
+    if [ ! -d "/opt/mxe/usr/bin" ]; then
         echoColor "    Cloning MXE and compiling mingw32.static GCC"
         cd $HOME
         sudo -E git clone https://github.com/mxe/mxe.git
         cd mxe
         sudo make -j12 gcc gmp
-        sudo find . ! -name "$HOME/mxe/usr/bin/*" -type f -exec rm -f {} +
+        sudo find . ! -name "/opt/mxe/usr/bin/*" -type f -exec rm -f {} +
         sudo find /opt/mxe
     else
        echoColor "    MXE is already installed. You'd better make sure that you've previously made MXE's gcc! (/opt/mxe/usr/bin/i686-w64-mingw32.static-gcc)"

@@ -6,12 +6,12 @@ on:
     branches: [ "main" ]
     paths:
       - Dockerfile
-      - build.sh
+      - buildx.sh
   pull_request:
     branches: [ "main" ]
     paths:
       - Dockerfile
-      - build.sh
+      - buildx.sh
 
 jobs:
   push_to_registry:
