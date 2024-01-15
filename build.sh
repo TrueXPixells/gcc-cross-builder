@@ -64,6 +64,7 @@ function installPackages {
         gettext
         git
         gperf
+        libtool-bin
         intltool
         libc6-dev-i386
         libgdk-pixbuf2.0-dev
