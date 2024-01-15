@@ -201,8 +201,10 @@ function compile {
     configureArgs="--target=$BUILD_TARGET --disable-nls --disable-werror --prefix=$HOME/$1-$BUILD_TARGET/output"
    
     if [ $ON_MAC == true ]; then
+    SED=gsed
     configureArgs="--with-sysroot=/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk $configureArgs"
     else
+    SED=sed
     configureArgs="--with-sysroot $configureArgs"
     fi
     if [ $1 == "binutils" ]; then
@@ -225,7 +227,7 @@ function compile {
         echoColor "        Installing config/i386/t-x86_64-elf"
         echo -e "MULTILIB_OPTIONS += mno-red-zone\nMULTILIB_DIRNAMES += no-red-zone" > ../gcc-$GCC_VERSION/gcc/config/i386/t-x86_64-elf
         echoColor "        Patching gcc/config.gcc"
-        sed -i '/x86_64-\*-elf\*)/a \\ttmake_file="${tmake_file} i386/t-x86_64-elf" # include the new multilib configuration' ../gcc-$GCC_VERSION/gcc/config.gcc
+        $SED -i '/x86_64-\*-elf\*)/a \\ttmake_file="${tmake_file} i386/t-x86_64-elf" # include the new multilib configuration' ../gcc-$GCC_VERSION/gcc/config.gcc
     fi
 
     ../$1-$2/configure $configureArgs
