@@ -18,6 +18,11 @@ done
 
 export PATH="/opt/mxe/usr/bin:$HOME-$BUILD_TARGET/linux/output/bin:$HOME-$BUILD_TARGET/windows/output/bin:$PATH"
 
+ON_MAC=false
+if [[ "$OSTYPE" == "darwin"* ]]; then
+ON_MAC=true
+fi
+
 echo "BUILD_TARGET     = ${BUILD_TARGET}"
 echo "ENV = ${ENV_ONLY}"
 echo "BINUTILS_VERSION = ${BINUTILS_VERSION}"
@@ -26,19 +31,58 @@ echo "GDB_VERSION      = ${GDB_VERSION}"
 echo "PATH             = ${PATH}"
 
 function main {
-    installPackages
-    installMXE
-    sudo rm -rf /var/lib/apt/lists /opt/mxe/.ccache /opt/mxe/pkg
-    sudo find /opt/mxe
+    if [ $ON_MAC == true ]; then
+        installPackagesMac
+    else
+        installPackages
+        installMXE
+    fi
     if [[ $ENV_ONLY == true ]]; then
         echoColor "Successfully installed build environment. Exiting as 'env' only was specified"
         return
     fi
     downloadSources
-    compileAll "linux"
-    compileAll "windows"
-    echo -e "\e[92mZipped everything to $HOME/${BUILD_TARGET}-tools-[windows | linux].zip\e[39m"
+    if [ $ON_MAC == true ]; then
+    compileAll "macos"
+    else
+        compileAll "linux"
+        compileAll "windows"
+    fi
+    echo -e "\e[92mZipped everything to $HOME/${BUILD_TARGET}-tools-[windows | linux | macos].zip\e[39m"
 }
+
+function installPackagesMac {
+    pkgList=(
+        autoconf 
+        automake
+        bash
+        bison
+        bzip2
+        flex
+        git
+        #g++
+        #g++-multilib
+        gettext
+        gperf
+        intltool
+        #libc6-dev-i386
+        gdk-pixbuf
+        #libltdl-dev
+        #libgl-dev
+        pcre
+        openssl
+        libtool #
+        #libxml-parser-perl
+        lzip
+        make
+        p7zip
+        perl
+    )
+
+    sudo brew update
+    sudo brew upgrade
+}
+
 function installPackages {
     pkgList=(
         autoconf
@@ -118,12 +162,14 @@ function installPackages {
 
 function installMXE {
     echoColor "Installing MXE"
-    if [ ! -d "/opt/mxe/usr/bin" ]; then
+    if [ ! -d "$HOME/mxe/usr/bin" ]; then
         echoColor "    Cloning MXE and compiling mingw32.static GCC"
-        cd /opt
+        cd $HOME
         sudo -E git clone https://github.com/mxe/mxe.git
         cd mxe
         sudo make -j12 gcc gmp
+        sudo find . ! -name "$HOME/mxe/usr/bin/*" -type f -exec rm -f {} +
+        sudo find /opt/mxe
     else
        echoColor "    MXE is already installed. You'd better make sure that you've previously made MXE's gcc! (/opt/mxe/usr/bin/i686-w64-mingw32.static-gcc)"
     fi
@@ -136,11 +182,17 @@ function downloadSources {
     downloadAndExtract "gcc" $GCC_VERSION "http://ftp.gnu.org/gnu/gcc/gcc-$GCC_VERSION/gcc-$GCC_VERSION.tar.gz"
     downloadAndExtract "gdb" $GDB_VERSION
     echoColor "        Downloading GCC prerequisites"
+    if [ $ON_MAC == true ]; then
+    cd ./macos-$BUILD_TARGET/gcc-$GCC_VERSION
+    ./contrib/download_prerequisites
+    else
     cd ./linux-$BUILD_TARGET/gcc-$GCC_VERSION
     ./contrib/download_prerequisites
     cd ../..
     cd ./windows-$BUILD_TARGET/gcc-$GCC_VERSION
     ./contrib/download_prerequisites
+    fi
+    cd ../..
 }
 
 function downloadAndExtract {
@@ -158,6 +210,14 @@ function downloadAndExtract {
         fi
     fi
 
+    if [ $ON_MAC == true ]; then
+    mkdir -p macos-$BUILD_TARGET
+    cd macos-$BUILD_TARGET
+    if [ ! -d $name-$version ]; then
+        echoColor "        [macos]   Extracting $name-$version.tar.gz"
+        tar -xf ../$name-$version.tar.gz
+    fi
+    else
     mkdir -p linux-$BUILD_TARGET
     cd linux-$BUILD_TARGET
     if [ ! -d $name-$version ]; then
@@ -171,12 +231,14 @@ function downloadAndExtract {
         echoColor "        [windows] Extracting $name-$version.tar.gz"
         tar -xf ../$name-$version.tar.gz
     fi
+
+    fi
     cd ..
 }
 
 function compileAll {
     echoColor "Compiling all $1"
-    cd $1-$BUILD_TARGET
+    cd $HOME/$1-$BUILD_TARGET
     mkdir -p output
 
     compile binutils $BINUTILS_VERSION $1
@@ -194,8 +256,13 @@ function compile {
     echoColor "    Compiling $1 [$3-$BUILD_TARGET]"
     mkdir -p build-$1-$2
     cd build-$1-$2
-    configureArgs="--target=$BUILD_TARGET --with-sysroot --disable-nls --disable-werror --prefix=$HOME/$1-$BUILD_TARGET/output"
-    
+    configureArgs="--target=$BUILD_TARGET --disable-nls --disable-werror --prefix=$HOME/$1-$BUILD_TARGET/output"
+   
+    if [ $ON_MAC == true ]; then
+    configureArgs="--with-sysroot=/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk $configureArgs"
+    else
+    configureArgs="--with-sysroot $configureArgs"
+    fi
     if [ $1 == "binutils" ]; then
     if [[ $BUILD_TARGET == "i386-elf" || $BUILD_TARGET == "i686-elf" || $BUILD_TARGET == "x86_64-elf" ]]; then
         configureArgs="--enable-targets=x86_64-pep $configureArgs"
