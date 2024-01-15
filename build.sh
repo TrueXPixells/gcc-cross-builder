@@ -165,10 +165,11 @@ function compile {
     if [ $ON_MAC == true ]; then
     SED=gsed
     configureArgs="--with-sysroot=/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk $configureArgs"
-    else if [ ! $1 == "gcc" ]; then
+    else if [ $1 != "gcc" ]; then
     SED=sed
     configureArgs="--with-sysroot $configureArgs"
     fi
+
     if [ $1 == "binutils" ]; then
     if [[ $BUILD_TARGET == "i386-elf" || $BUILD_TARGET == "i686-elf" || $BUILD_TARGET == "x86_64-elf" ]]; then
         configureArgs="--enable-targets=x86_64-pep $configureArgs"
