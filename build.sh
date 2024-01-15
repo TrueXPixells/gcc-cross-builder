@@ -165,7 +165,7 @@ function compile {
     if [ $ON_MAC == true ]; then
     SED=gsed
     configureArgs="--with-sysroot=/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk $configureArgs"
-    else if [ $1 != "gcc" ]; then
+    elif [ $1 != "gcc" ]; then
     SED=sed
     configureArgs="--with-sysroot $configureArgs"
     fi
