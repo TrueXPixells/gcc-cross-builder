@@ -162,10 +162,10 @@ function compile {
     cd build-$1-$2
     configureArgs="--target=$BUILD_TARGET --disable-nls --disable-werror --prefix=$HOME/$1-$BUILD_TARGET/output"
    
-    if [ $ON_MAC == true ]; then
+    if [ $ON_MAC == true]; then
     SED=gsed
     configureArgs="--with-sysroot=/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk $configureArgs"
-    else
+    else if [ $1 == "gcc" ]; then
     SED=sed
     configureArgs="--with-sysroot $configureArgs"
     fi
