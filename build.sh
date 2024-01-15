@@ -79,8 +79,8 @@ function installPackagesMac {
         perl
     )
 
-    sudo brew update
-    sudo brew upgrade
+    brew update
+    brew upgrade
 }
 
 function installPackages {
