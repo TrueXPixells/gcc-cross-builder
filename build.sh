@@ -58,48 +58,10 @@ function installPackagesMac {
 }
 
 function installPackages {
-    pkgList=(
-        autopoint
-        g++-multilib
-        gettext
-        git
-        gperf
-        libtool-bin
-        intltool
-        libc6-dev-i386
-        libgdk-pixbuf2.0-dev
-        libltdl-dev
-        libgl-dev
-        libpcre3-dev
-        libxml-parser-perl
-        lzip
-        python3-distutils
-        python3-mako 
-        python3-pkg-resources
-        sed
-        
-        build-essential
-        
-        # GCC
-        #gawk
-        #gzip
-        libmpc-dev
-        libisl-dev
-        # GDB
-        libgmp-dev
-        libgmp10
-        libmpfr-dev
-        libmpfr6
-        guile-3.0-dev
-        libexpat1-dev
-        
-        liblzma-dev
-        zlib1g-dev
-        )
     echoColor "Installing packages"
     sudo apt-get update -y
     sudo apt-get upgrade -y
-    sudo -E DEBIAN_FRONTEND=noninteractive apt-get  install $pkgList -y
+    sudo -E DEBIAN_FRONTEND=noninteractive apt-get install -y autopoint g++-multilib gettext gperf libtool-bin intltool libc6-dev-i386 libgdk-pixbuf2.0-dev libltdl-dev libgl-dev libpcre3-dev libxml-parser-perl lzip python3-distutils python3-mako  python3-pkg-resources sed build-essential libmpc-dev libisl-dev libgmp-dev libgmp10 libmpfr-dev libmpfr6 guile-3.0-dev libexpat1-dev liblzma-dev zlib1g-dev
 }
 
 function installMXE {
