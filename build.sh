@@ -68,7 +68,7 @@ function installMXE {
     echoColor "Installing MXE"
     if [ ! -d "/opt/mxe/usr/bin" ]; then
         echoColor "    Cloning MXE and compiling mingw32.static GCC"
-        cd $HOME
+        cd /opt
         sudo -E git clone https://github.com/mxe/mxe.git
         cd mxe
         sudo make -j12 gcc gmp
@@ -185,7 +185,7 @@ function compile {
         configureArgs="--host=i686-w64-mingw32.static $configureArgs"
     fi
     
-    if [[ $1 == "gcc" || $BUILD_TARGET == "x86_64-elf" ]]; then
+    if [[ $1 == "gcc" && $BUILD_TARGET == "x86_64-elf" ]]; then
         echoColor "        Installing config/i386/t-x86_64-elf"
         echo -e "MULTILIB_OPTIONS += mno-red-zone\nMULTILIB_DIRNAMES += no-red-zone" > ../gcc-$GCC_VERSION/gcc/config/i386/t-x86_64-elf
         echoColor "        Patching gcc/config.gcc"
@@ -199,7 +199,7 @@ function compile {
         make -j12
     fi
 
-    if [[ $1 == "gcc" || $BUILD_TARGET == "x86_64-elf" ]]; then
+    if [[ $1 == "gcc" && $BUILD_TARGET == "x86_64-elf" ]]; then
         make -j12 all-target-libgcc CFLAGS_FOR_TARGET='-g -O2 -mcmodel=large -mno-red-zone'
     else
         make -j12 all-target-libgcc
@@ -212,7 +212,7 @@ function compile {
     sudo make install
     fi
     
-    if [[ $1 == "gcc" || $BUILD_TARGET == "x86_64-elf" ]]; then
+    if [[ $1 == "gcc" && $BUILD_TARGET == "x86_64-elf" ]]; then
         if [ $3 == "windows" ]; then
             cd "${BUILD_TARGET}/no-red-zone/libgcc"
             sudo make install
