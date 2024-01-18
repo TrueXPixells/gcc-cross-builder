@@ -22,6 +22,11 @@ export PATH="/opt/mxe/usr/bin:$HOME/linux-$BUILD_TARGET/output/bin:$HOME/windows
 ON_MAC=false
 if [[ "$OSTYPE" == "darwin"* ]]; then
 ON_MAC=true
+
+XCODE=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
+CLT=/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk
+SDKROOT=$(xcrun --show-sdk-path)
+
 fi
 
 echo "BUILD_TARGET     = ${BUILD_TARGET}"
@@ -161,14 +166,18 @@ function compile {
     echoColor "    Compiling $1 [$3-$BUILD_TARGET]"
     mkdir -p build-$1-$2
     cd build-$1-$2
-    configureArgs="--target=$BUILD_TARGET --disable-nls --disable-werror --prefix=$HOME/$1-$BUILD_TARGET/output"
+    configureArgs="--target=$BUILD_TARGET --disable-nls --prefix=$HOME/$1-$BUILD_TARGET/output"
    
+    if [ $1 == "gcc" ]; then
+    configureArgs="--enable-languages=c,c++ --without-headers $configureArgs"
+    fi
+
     if [ $ON_MAC == true ]; then
     SED=gsed
-    configureArgs="--with-sysroot=/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk $configureArgs"
+    configureArgs="--with-build-sysroot=$SDKROOT --with-sysroot --with-specs="%{!sysroot=*:--sysroot=%:if-exists-else($XCODE $CLT)}" $configureArgs"
     elif [ $1 != "gcc" ]; then
     SED=sed
-    configureArgs="--with-sysroot $configureArgs"
+    configureArgs="--with-sysroot --disable-werror $configureArgs"
     fi
 
     if [ $1 == "binutils" ]; then
