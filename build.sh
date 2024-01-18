@@ -16,7 +16,7 @@ case $key in
 esac
 done
 
-export PATH="/opt/mxe/usr/bin:$HOME-$BUILD_TARGET/linux/output/bin:$HOME-$BUILD_TARGET/windows/output/bin:$PATH"
+export PATH="/opt/mxe/usr/bin:$HOME/linux-$BUILD_TARGET/output/bin:$HOME/windows-$BUILD_TARGET/output/bin:$HOME/macos-$BUILD_TARGET/output/bin:$PATH"
 
 ON_MAC=false
 if [[ "$OSTYPE" == "darwin"* ]]; then
