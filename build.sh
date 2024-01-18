@@ -72,7 +72,7 @@ function installMXE {
         sudo -E git clone https://github.com/mxe/mxe.git
         cd mxe
         sudo make -j12 gcc gmp
-        sudo find . ! -name "/opt/mxe/usr/bin/*" -type f -exec rm -f {} +
+        sudo rm -rf .ccache plugins src ext pkg log tools docs .github
         sudo find /opt/mxe
     else
        echoColor "    MXE is already installed. You'd better make sure that you've previously made MXE's gcc! (/opt/mxe/usr/bin/i686-w64-mingw32.static-gcc)"
