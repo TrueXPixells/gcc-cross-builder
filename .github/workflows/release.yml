@@ -39,7 +39,7 @@ jobs:
       fail-fast: false
       matrix:
         arch: [i386-elf, i686-elf, x86_64-elf, aarch64-elf, riscv64-elf, arm-none-eabi]
-        platform: [ubuntu-latest, macos-latest]
+        platform: [ubuntu-latest, macos-13]
     name: ${{ matrix.arch }}
     runs-on: ${{ matrix.platform }}
     steps:
@@ -70,7 +70,7 @@ jobs:
           asset_name: ${{ matrix.arch }}-tools-windows.zip
           asset_content_type: application/zip
       - name: release mac
-        if: ${{ matrix.platform == 'macos-latest' }}
+        if: ${{ matrix.platform == 'macos-13' }}
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
