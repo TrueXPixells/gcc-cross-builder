@@ -201,15 +201,15 @@ function compile {
 
     ../$name-$version/configure $configureArgs
     if [ $name == "gcc" ]; then
-        make -j12 all-gcc
+        make -j12 all-gcc MAKEINFO=true
     else
-        make -j12
+        make -j12 MAKEINFO=true
     fi
 
     if [[ $name == "gcc" && $target == "x86_64-elf" ]]; then
-        make -j12 all-target-libgcc CFLAGS_FOR_TARGET='-g -O2 -mcmodel=large -mno-red-zone'
+        make -j12 all-target-libgcc CFLAGS_FOR_TARGET='-g -O2 -mcmodel=large -mno-red-zone' MAKEINFO=true
     else
-        make -j12 all-target-libgcc
+        make -j12 all-target-libgcc MAKEINFO=true
     fi
 
     if [[ $name == "gcc" ]]; then
