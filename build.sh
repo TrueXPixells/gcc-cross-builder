@@ -30,9 +30,7 @@ echo "GDB_VERSION      = ${GDB_VERSION}"
 echo "PATH             = ${PATH}"
 
 function main {
-    if [ $ON_MAC == true ]; then
-#        installPackagesMac
-    else
+    if [ $ON_MAC != true ]; then
         installPackages
         installMXE
     fi
