@@ -8,7 +8,6 @@ do
 key="$1"
 
 case $key in
-    env)                    ENV_ONLY=true;          shift;;
     -t|--target)            BUILD_TARGET="$2";      shift; shift ;;
     -bv|--binutils-version) BINUTILS_VERSION="$2";  shift; shift ;;
     -gv|--gcc-version)      GCC_VERSION="$2";       shift; shift ;;
@@ -30,7 +29,6 @@ SDKROOT=$(xcrun --show-sdk-path)
 fi
 
 echo "BUILD_TARGET     = ${BUILD_TARGET}"
-echo "ENV = ${ENV_ONLY}"
 echo "BINUTILS_VERSION = ${BINUTILS_VERSION}"
 echo "GCC_VERSION      = ${GCC_VERSION}"
 echo "GDB_VERSION      = ${GDB_VERSION}"
@@ -43,10 +41,7 @@ function main {
         installPackages
         installMXE
     fi
-    if [[ $ENV_ONLY == true ]]; then
-        echoColor "Successfully installed build environment. Exiting as 'env' only was specified"
-        return
-    fi
+
     downloadSources
     if [ $ON_MAC == true ]; then
     compileAll "macos"
@@ -60,7 +55,7 @@ function main {
 function installPackagesMac {
 #    brew update
 #    brew upgrade
-    brew install autoconf automake bison bzip2 flex gettext gperf intltool gdk-pixbuf pcre openssl libtool lzip make p7zip gnu-sed unzip xz texinfo libmpc isl gmp mpfr guile expat zlib gawk gzip
+    brew install coreutils bzip2 flex gperf intltool gdk-pixbuf pcre openssl libtool lzip make p7zip gnu-sed unzip libmpc isl gmp mpfr guile expat zlib gawk gzip
 }
 
 function installPackages {
@@ -147,6 +142,7 @@ function downloadAndExtract {
 }
 
 function compileAll {
+    # $1: platform
     echoColor "Compiling all $1"
     cd $HOME/$1-$BUILD_TARGET
     mkdir -p output
@@ -163,24 +159,25 @@ function compileAll {
 }
 
 function compile {
-    echoColor "    Compiling $1 [$3-$BUILD_TARGET]"
-    mkdir -p build-$1-$2
-    cd build-$1-$2
-    configureArgs="--target=$BUILD_TARGET --disable-nls --prefix=$HOME/$1-$BUILD_TARGET/output"
+    name=$1
+    version=$2
+    platform=$3
+    echoColor "    Compiling $name [$platform-$BUILD_TARGET]"
+    mkdir -p build-$name-$version
+    cd build-$name-$version
+    configureArgs="--target=$BUILD_TARGET --disable-nls --disable-werror --with-sysroot --prefix=$HOME/$platform-$BUILD_TARGET/output"
    
-    if [ $1 == "gcc" ]; then
+    if [ $name == "gcc" ]; then
     configureArgs="--enable-languages=c,c++ --without-headers $configureArgs"
     fi
 
     if [ $ON_MAC == true ]; then
     SED=gsed
-    #configureArgs="--with-build-sysroot=$SDKROOT --with-sysroot --with-specs=\"%{!sysroot=*:--sysroot=%:if-exists-else($XCODE $CLT)}\" $configureArgs"
-    elif [ $1 != "gcc" ]; then
+    else
     SED=sed
-    configureArgs="--with-sysroot --disable-werror $configureArgs"
     fi
 
-    if [ $1 == "binutils" ]; then
+    if [ $name == "binutils" ]; then
     if [[ $BUILD_TARGET == "i386-elf" || $BUILD_TARGET == "i686-elf" || $BUILD_TARGET == "x86_64-elf" ]]; then
         configureArgs="--enable-targets=x86_64-pep $configureArgs"
     fi
@@ -192,44 +189,44 @@ function compile {
     fi
     fi
 
-    if [ $3 == "windows" ]; then
+    if [ $platform == "windows" ]; then
         configureArgs="--host=i686-w64-mingw32.static $configureArgs"
     fi
     
-    if [[ $1 == "gcc" && $BUILD_TARGET == "x86_64-elf" ]]; then
+    if [[ $name == "gcc" && $BUILD_TARGET == "x86_64-elf" ]]; then
         echoColor "        Installing config/i386/t-x86_64-elf"
         echo -e "MULTILIB_OPTIONS += mno-red-zone\nMULTILIB_DIRNAMES += no-red-zone" > ../gcc-$GCC_VERSION/gcc/config/i386/t-x86_64-elf
         echoColor "        Patching gcc/config.gcc"
         $SED -i '/x86_64-\*-elf\*)/a \\ttmake_file="${tmake_file} i386/t-x86_64-elf" # include the new multilib configuration' ../gcc-$GCC_VERSION/gcc/config.gcc
     fi
 
-    ../$1-$2/configure $configureArgs
-    if [ $1 == "gcc" ]; then
+    ../$name-$version/configure $configureArgs
+    if [ $name == "gcc" ]; then
         make -j12 all-gcc
     else
         make -j12
     fi
 
-    if [[ $1 == "gcc" && $BUILD_TARGET == "x86_64-elf" ]]; then
+    if [[ $name == "gcc" && $BUILD_TARGET == "x86_64-elf" ]]; then
         make -j12 all-target-libgcc CFLAGS_FOR_TARGET='-g -O2 -mcmodel=large -mno-red-zone'
     else
         make -j12 all-target-libgcc
     fi
 
-    if [[ $1 == "gcc" ]]; then
+    if [[ $name == "gcc" ]]; then
     sudo make -j12 install-gcc
     sudo make install-target-libgcc
     else
     sudo make install
     fi
     
-    if [[ $1 == "gcc" && $BUILD_TARGET == "x86_64-elf" ]]; then
-        if [ $3 == "windows" ]; then
+    if [[ $name == "gcc" && $BUILD_TARGET == "x86_64-elf" ]]; then
+        if [ $platform == "windows" ]; then
             cd "${BUILD_TARGET}/no-red-zone/libgcc"
             sudo make install
             cd ../../..
         fi
-        if [[ ! -d "../output/lib/gcc/x86_64-elf/$2/no-red-zone" ]]; then
+        if [[ ! -d "../output/lib/gcc/x86_64-elf/$version/no-red-zone" ]]; then
             echoError "ERROR: no-red-zone was not created. x64 patching failed"
             exit 1
         else
