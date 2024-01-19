@@ -174,7 +174,7 @@ function compile {
 
     if [ $ON_MAC == true ]; then
     SED=gsed
-    configureArgs="--with-build-sysroot=$SDKROOT --with-sysroot --with-specs=\"%{!sysroot=*:--sysroot=%:if-exists-else($XCODE $CLT)}\" $configureArgs"
+    #configureArgs="--with-build-sysroot=$SDKROOT --with-sysroot --with-specs=\"%{!sysroot=*:--sysroot=%:if-exists-else($XCODE $CLT)}\" $configureArgs"
     elif [ $1 != "gcc" ]; then
     SED=sed
     configureArgs="--with-sysroot --disable-werror $configureArgs"
