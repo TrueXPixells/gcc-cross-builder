@@ -203,7 +203,7 @@ function compile {
     configureArgs="--with-sysroot $configureArgs"
     fi
     
-    if [ $name == "binutilsx" ]; then
+    if [ $name == "binutils" ]; then
     if [[ $target == "i386-elf" || $target == "i686-elf" || $target == "x86_64-elf" ]]; then
         configureArgs="--enable-targets=x86_64-pep $configureArgs"
     fi
