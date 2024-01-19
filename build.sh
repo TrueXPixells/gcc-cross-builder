@@ -16,8 +16,6 @@ case $key in
 esac
 done
 
-export PATH="/opt/mxe/usr/bin:$HOME/linux-$BUILD_TARGET/output/bin:$HOME/windows-$BUILD_TARGET/output/bin:$HOME/macos-$BUILD_TARGET/output/bin:$PATH"
-
 ON_MAC=false
 if [[ "$OSTYPE" == "darwin"* ]]; then
 ON_MAC=true
@@ -96,6 +94,7 @@ function installMXE {
         sudo make -j12 gcc gmp
         sudo rm -rf .ccache plugins src ext pkg log tools docs .github
         sudo find /opt/mxe
+        PATH="/opt/mxe/usr/bin:$PATH"
     else
        echoColor "    MXE is already installed. You'd better make sure that you've previously made MXE's gcc! (/opt/mxe/usr/bin/i686-w64-mingw32.static-gcc)"
     fi
@@ -170,7 +169,7 @@ function compileAll {
     echoColor "Compiling all $platform"
     cd $HOME/$platform-$target
     mkdir -p output
-
+    PATH="$HOME/$platform-$target/output/bin:$PATH"
     compile binutils $BINUTILS_VERSION $platform $target
     compile gcc $GCC_VERSION $platform $target
     compile gdb $GDB_VERSION $platform $target
@@ -179,7 +178,7 @@ function compileAll {
         cd $HOME/$platform-$target/output
         zip -r "$HOME/$target-tools-$1.zip" *
     fi
-    sudo rm -rf $HOME/$platform-$target
+#    sudo rm -rf $HOME/$platform-$target
 }
 
 function compile {
