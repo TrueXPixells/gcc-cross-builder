@@ -158,7 +158,7 @@ function compile {
     echoColor "    Compiling $name [$platform-$BUILD_TARGET]"
     mkdir -p build-$name-$version
     cd build-$name-$version
-    configureArgs="--enable-silent-rules --target=$BUILD_TARGET --disable-nls --disable-werror --prefix=$HOME/$platform-$BUILD_TARGET/output"
+    configureArgs="--enable-silent-rules --target=$BUILD_TARGET --disable-nls --prefix=$HOME/$platform-$BUILD_TARGET/output"
    
     if [ $name == "gcc" ]; then
     configureArgs="--enable-languages=c,c++ --without-headers $configureArgs"
