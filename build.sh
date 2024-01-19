@@ -28,7 +28,9 @@ echo "GDB_VERSION      = ${GDB_VERSION}"
 echo "PATH             = ${PATH}"
 
 function main {
-    if [ $ON_MAC != true ]; then
+    if [ $ON_MAC == true ]; then
+        installPackagesMac
+    else
         installPackages
         installMXE
     fi
@@ -43,11 +45,13 @@ function main {
     echo -e "\e[92mZipped everything to $HOME/${BUILD_TARGET}-tools-[windows | linux | macos].zip\e[39m"
 }
 
-#function installPackagesMac {
+function installPackagesMac {
 #    brew update
 #    brew upgrade
 #    brew install --force coreutils bzip2 flex gperf intltool gdk-pixbuf pcre openssl libtool lzip make p7zip gnu-sed unzip libmpc isl gmp mpfr guile expat zlib gawk gzip
-#}
+    brew install gsed
+    PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"
+}
 
 function installPackages {
     echoColor "Installing packages"
@@ -144,7 +148,9 @@ function downloadAndExtract {
         echoColor "        [macos]   Extracting $name-$version.tar.gz"
         tar -xf ../$name-$version.tar.gz
     fi
+
     else
+    
     mkdir -p linux-$target
     cd linux-$target
     if [ ! -d $name-$version ]; then
@@ -189,18 +195,12 @@ function compile {
     echoColor "    Compiling $name [$platform-$target]"
     mkdir -p build-$name-$version
     cd build-$name-$version
-    configureArgs="--enable-silent-rules --target=$target --disable-nls --prefix=$HOME/$platform-$target/output"
+    configureArgs="--target=$target --disable-nls --prefix=$HOME/$platform-$target/output"
    
     if [ $name == "gcc" ]; then
     configureArgs="--enable-languages=c,c++ --without-headers $configureArgs"
     else
     configureArgs="--with-sysroot $configureArgs"
-    fi
-
-    if [ $ON_MAC == true ]; then
-    SED=gsed
-    else
-    SED=sed
     fi
     
     if [ $name == "binutils" ]; then
@@ -223,7 +223,7 @@ function compile {
         echoColor "        Installing config/i386/t-x86_64-elf"
         echo -e "MULTILIB_OPTIONS += mno-red-zone\nMULTILIB_DIRNAMES += no-red-zone" > ../gcc-$GCC_VERSION/gcc/config/i386/t-x86_64-elf
         echoColor "        Patching gcc/config.gcc"
-        $SED -i '/x86_64-\*-elf\*)/a \\ttmake_file="${tmake_file} i386/t-x86_64-elf" # include the new multilib configuration' ../gcc-$GCC_VERSION/gcc/config.gcc
+        sed -i '/x86_64-\*-elf\*)/a \\ttmake_file="${tmake_file} i386/t-x86_64-elf" # include the new multilib configuration' ../gcc-$GCC_VERSION/gcc/config.gcc
     fi
 
     ../$name-$version/configure $configureArgs
