@@ -21,11 +21,6 @@ export PATH="/opt/mxe/usr/bin:$HOME/linux-$BUILD_TARGET/output/bin:$HOME/windows
 ON_MAC=false
 if [[ "$OSTYPE" == "darwin"* ]]; then
 ON_MAC=true
-
-XCODE=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
-CLT=/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk
-SDKROOT=$(xcrun --show-sdk-path)
-
 fi
 
 echo "BUILD_TARGET     = ${BUILD_TARGET}"
@@ -165,7 +160,7 @@ function compile {
     echoColor "    Compiling $name [$platform-$BUILD_TARGET]"
     mkdir -p build-$name-$version
     cd build-$name-$version
-    configureArgs="--target=$BUILD_TARGET --disable-nls --disable-werror --prefix=$HOME/$platform-$BUILD_TARGET/output"
+    configureArgs="--enable-silent-rules --target=$BUILD_TARGET --disable-nls --disable-werror --prefix=$HOME/$platform-$BUILD_TARGET/output"
    
     if [ $name == "gcc" ]; then
     configureArgs="--enable-languages=c,c++ --without-headers $configureArgs"
