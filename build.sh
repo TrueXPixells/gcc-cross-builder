@@ -165,10 +165,12 @@ function compile {
     echoColor "    Compiling $name [$platform-$BUILD_TARGET]"
     mkdir -p build-$name-$version
     cd build-$name-$version
-    configureArgs="--target=$BUILD_TARGET --disable-nls --disable-werror --with-sysroot --prefix=$HOME/$platform-$BUILD_TARGET/output"
+    configureArgs="--target=$BUILD_TARGET --disable-nls --disable-werror --prefix=$HOME/$platform-$BUILD_TARGET/output"
    
     if [ $name == "gcc" ]; then
     configureArgs="--enable-languages=c,c++ --without-headers $configureArgs"
+    else
+    configureArgs="--with-sysroot $configureArgs"
     fi
 
     if [ $ON_MAC == true ]; then
@@ -176,7 +178,7 @@ function compile {
     else
     SED=sed
     fi
-
+    
     if [ $name == "binutils" ]; then
     if [[ $BUILD_TARGET == "i386-elf" || $BUILD_TARGET == "i686-elf" || $BUILD_TARGET == "x86_64-elf" ]]; then
         configureArgs="--enable-targets=x86_64-pep $configureArgs"
