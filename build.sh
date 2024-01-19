@@ -21,9 +21,6 @@ export PATH="/opt/mxe/usr/bin:$HOME/linux-$BUILD_TARGET/output/bin:$HOME/windows
 ON_MAC=false
 if [[ "$OSTYPE" == "darwin"* ]]; then
 ON_MAC=true
-PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"
-PATH="/usr/local/opt/make/libexec/gnubin:$PATH"
-PATH="/usr/local/opt/unzip/bin:$PATH"
 fi
 
 echo "BUILD_TARGET     = ${BUILD_TARGET}"
@@ -51,9 +48,9 @@ function main {
 }
 
 function installPackagesMac {
-#    brew update
-#    brew upgrade
-    brew install --force coreutils bzip2 flex gperf intltool gdk-pixbuf pcre openssl libtool lzip make p7zip gnu-sed unzip libmpc isl gmp mpfr guile expat zlib gawk gzip
+    brew update
+    brew upgrade
+#    brew install --force coreutils bzip2 flex gperf intltool gdk-pixbuf pcre openssl libtool lzip make p7zip gnu-sed unzip libmpc isl gmp mpfr guile expat zlib gawk gzip
 }
 
 function installPackages {
