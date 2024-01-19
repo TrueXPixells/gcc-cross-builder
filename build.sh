@@ -48,8 +48,8 @@ function main {
 }
 
 function installPackagesMac {
-    brew update
-    brew upgrade
+#    brew update
+#    brew upgrade
 #    brew install --force coreutils bzip2 flex gperf intltool gdk-pixbuf pcre openssl libtool lzip make p7zip gnu-sed unzip libmpc isl gmp mpfr guile expat zlib gawk gzip
 }
 
