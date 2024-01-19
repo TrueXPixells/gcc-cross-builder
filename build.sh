@@ -35,12 +35,12 @@ function main {
         installMXE
     fi
 
-    downloadSources
+    downloadSources $BUILD_TARGET
     if [ $ON_MAC == true ]; then
-    compileAll "macos"
+        compileAll "macos" $BUILD_TARGET
     else
-        compileAll "linux"
-        compileAll "windows"
+        compileAll "linux" $BUILD_TARGET
+        compileAll "windows" $BUILD_TARGET
     fi
     echo -e "\e[92mZipped everything to $HOME/${BUILD_TARGET}-tools-[windows | linux | macos].zip\e[39m"
 }
@@ -74,20 +74,21 @@ function installMXE {
 }
 
 function downloadSources {
+    target=$1
     cd $HOME
     echoColor "Downloading all sources"
-    downloadAndExtract "binutils" $BINUTILS_VERSION
-    downloadAndExtract "gcc" $GCC_VERSION "http://ftp.gnu.org/gnu/gcc/gcc-$GCC_VERSION/gcc-$GCC_VERSION.tar.gz"
-    downloadAndExtract "gdb" $GDB_VERSION
+    downloadAndExtract "binutils" $target $BINUTILS_VERSION
+    downloadAndExtract "gcc" $target $GCC_VERSION "http://ftp.gnu.org/gnu/gcc/gcc-$GCC_VERSION/gcc-$GCC_VERSION.tar.gz"
+    downloadAndExtract "gdb" $target $GDB_VERSION
     echoColor "        Downloading GCC prerequisites"
     if [ $ON_MAC == true ]; then
-    cd ./macos-$BUILD_TARGET/gcc-$GCC_VERSION
+    cd ./macos-$target/gcc-$GCC_VERSION
     ./contrib/download_prerequisites
     else
-    cd ./linux-$BUILD_TARGET/gcc-$GCC_VERSION
+    cd ./linux-$target/gcc-$GCC_VERSION
     ./contrib/download_prerequisites
     cd ../..
-    cd ./windows-$BUILD_TARGET/gcc-$GCC_VERSION
+    cd ./windows-$target/gcc-$GCC_VERSION
     ./contrib/download_prerequisites
     fi
     cd ../..
@@ -95,13 +96,14 @@ function downloadSources {
 
 function downloadAndExtract {
     name=$1
-    version=$2
-    override=$3
+    target=$2
+    version=$3
+    override=$4
     
     echoColor "    Processing $name"
     if [ ! -f $name-$version.tar.gz ]; then
         echoColor "        Downloading $name-$version.tar.gz"
-        if [ -z $3 ]; then
+        if [ -z $override ]; then
             wget -q http://ftp.gnu.org/gnu/$name/$name-$version.tar.gz
         else
             wget -q $override
@@ -109,22 +111,22 @@ function downloadAndExtract {
     fi
 
     if [ $ON_MAC == true ]; then
-    mkdir -p macos-$BUILD_TARGET
-    cd macos-$BUILD_TARGET
+    mkdir -p macos-$target
+    cd macos-$target
     if [ ! -d $name-$version ]; then
         echoColor "        [macos]   Extracting $name-$version.tar.gz"
         tar -xf ../$name-$version.tar.gz
     fi
     else
-    mkdir -p linux-$BUILD_TARGET
-    cd linux-$BUILD_TARGET
+    mkdir -p linux-$target
+    cd linux-$target
     if [ ! -d $name-$version ]; then
         echoColor "        [linux]   Extracting $name-$version.tar.gz"
         tar -xf ../$name-$version.tar.gz
     fi
     cd ..
-    mkdir -p windows-$BUILD_TARGET
-    cd windows-$BUILD_TARGET
+    mkdir -p windows-$target
+    cd windows-$target
     if [ ! -d $name-$version ]; then
         echoColor "        [windows] Extracting $name-$version.tar.gz"
         tar -xf ../$name-$version.tar.gz
@@ -135,30 +137,32 @@ function downloadAndExtract {
 }
 
 function compileAll {
-    # $1: platform
-    echoColor "Compiling all $1"
-    cd $HOME/$1-$BUILD_TARGET
+    platform=$1
+    target=$2
+    echoColor "Compiling all $platform"
+    cd $HOME/$platform-$target
     mkdir -p output
 
-    compile binutils $BINUTILS_VERSION $1
-    compile gcc $GCC_VERSION $1
-    compile gdb $GDB_VERSION $1
+    compile binutils $BINUTILS_VERSION $platform $target
+    compile gcc $GCC_VERSION $platform $target
+    compile gdb $GDB_VERSION $platform $target
     cd ..
-    if [[ -d "$HOME/$1-$BUILD_TARGET/output" ]]; then
-        cd $HOME/$1-$BUILD_TARGET/output
-        zip -r "$HOME/${BUILD_TARGET}-tools-$1.zip" *
+    if [[ -d "$HOME/$platform-$target/output" ]]; then
+        cd $HOME/$platform-$target/output
+        zip -r "$HOME/$target-tools-$1.zip" *
     fi
-    rm -rf $HOME/$1-$BUILD_TARGET
+    sudo rm -rf $HOME/$platform-$target
 }
 
 function compile {
     name=$1
     version=$2
     platform=$3
-    echoColor "    Compiling $name [$platform-$BUILD_TARGET]"
+    target=$4
+    echoColor "    Compiling $name [$platform-$target]"
     mkdir -p build-$name-$version
     cd build-$name-$version
-    configureArgs="--enable-silent-rules --target=$BUILD_TARGET --disable-nls --prefix=$HOME/$platform-$BUILD_TARGET/output"
+    configureArgs="--enable-silent-rules --target=$target --disable-nls --prefix=$HOME/$platform-$target/output"
    
     if [ $name == "gcc" ]; then
     configureArgs="--enable-languages=c,c++ --without-headers $configureArgs"
@@ -173,13 +177,13 @@ function compile {
     fi
     
     if [ $name == "binutils" ]; then
-    if [[ $BUILD_TARGET == "i386-elf" || $BUILD_TARGET == "i686-elf" || $BUILD_TARGET == "x86_64-elf" ]]; then
+    if [[ $target == "i386-elf" || $target == "i686-elf" || $target == "x86_64-elf" ]]; then
         configureArgs="--enable-targets=x86_64-pep $configureArgs"
     fi
-    if [ $BUILD_TARGET == "aarch64-elf" ]; then
+    if [ $target == "aarch64-elf" ]; then
         configureArgs="--enable-targets=aarch64-pe $configureArgs"
     fi
-    if [ $BUILD_TARGET == "arm-none-eabi" ]; then
+    if [ $target == "arm-none-eabi" ]; then
         configureArgs="--enable-targets=arm-pe $configureArgs"
     fi
     fi
@@ -188,7 +192,7 @@ function compile {
         configureArgs="--host=i686-w64-mingw32.static $configureArgs"
     fi
     
-    if [[ $name == "gcc" && $BUILD_TARGET == "x86_64-elf" ]]; then
+    if [[ $name == "gcc" && $target == "x86_64-elf" ]]; then
         echoColor "        Installing config/i386/t-x86_64-elf"
         echo -e "MULTILIB_OPTIONS += mno-red-zone\nMULTILIB_DIRNAMES += no-red-zone" > ../gcc-$GCC_VERSION/gcc/config/i386/t-x86_64-elf
         echoColor "        Patching gcc/config.gcc"
@@ -202,7 +206,7 @@ function compile {
         make -j12
     fi
 
-    if [[ $name == "gcc" && $BUILD_TARGET == "x86_64-elf" ]]; then
+    if [[ $name == "gcc" && $target == "x86_64-elf" ]]; then
         make -j12 all-target-libgcc CFLAGS_FOR_TARGET='-g -O2 -mcmodel=large -mno-red-zone'
     else
         make -j12 all-target-libgcc
@@ -215,7 +219,7 @@ function compile {
     sudo make install
     fi
     
-    if [[ $name == "gcc" && $BUILD_TARGET == "x86_64-elf" ]]; then
+    if [[ $name == "gcc" && $target == "x86_64-elf" ]]; then
         if [ $platform == "windows" ]; then
             cd "${BUILD_TARGET}/no-red-zone/libgcc"
             sudo make install
