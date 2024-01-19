@@ -55,7 +55,35 @@ function installPackages {
     echoColor "Installing packages"
     sudo apt-get update -y
     sudo apt-get upgrade -y
-    sudo -E DEBIAN_FRONTEND=noninteractive apt-get install -y autopoint g++-multilib gettext gperf libtool-bin intltool libc6-dev-i386 libgdk-pixbuf2.0-dev libltdl-dev libgl-dev libpcre3-dev libxml-parser-perl lzip python3-distutils python3-mako  python3-pkg-resources sed build-essential libmpc-dev libisl-dev libgmp-dev libgmp10 libmpfr-dev libmpfr6 guile-3.0-dev libexpat1-dev liblzma-dev zlib1g-dev
+    sudo -E DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    autopoint \
+    g++-multilib \
+    gettext \
+    gperf \
+    libtool-bin \
+    intltool \
+    libc6-dev-i386 \
+    libgdk-pixbuf2.0-dev \
+    libltdl-dev \
+    libgl-dev \
+    libpcre3-dev \
+    libxml-parser-perl \
+    lzip \
+    python3-distutils \
+    python3-mako \
+    python3-pkg-resources \
+    sed \
+    build-essential \
+    libmpc-dev \
+    libisl-dev \
+    libgmp-dev \
+    libgmp10 \
+    libmpfr-dev \
+    libmpfr6 \
+    guile-3.0-dev \
+    libexpat1-dev \
+    liblzma-dev \
+    zlib1g-dev
 }
 
 function installMXE {
@@ -213,16 +241,16 @@ function compile {
     fi
 
     if [[ $name == "gcc" ]]; then
-    sudo make -j12 install-gcc
-    sudo make install-target-libgcc
+    sudo make -j12 install-gcc MAKEINFO=true
+    sudo make install-target-libgcc MAKEINFO=true
     else
-    sudo make install
+    sudo make install MAKEINFO=true
     fi
     
     if [[ $name == "gcc" && $target == "x86_64-elf" ]]; then
         if [ $platform == "windows" ]; then
             cd "${BUILD_TARGET}/no-red-zone/libgcc"
-            sudo make install
+            sudo make install MAKEINFO=true
             cd ../../..
         fi
         if [[ ! -d "../output/lib/gcc/x86_64-elf/$version/no-red-zone" ]]; then
