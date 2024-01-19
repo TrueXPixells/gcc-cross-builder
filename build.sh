@@ -31,7 +31,7 @@ echo "PATH             = ${PATH}"
 
 function main {
     if [ $ON_MAC == true ]; then
-        installPackagesMac
+#        installPackagesMac
     else
         installPackages
         installMXE
@@ -47,13 +47,11 @@ function main {
     echo -e "\e[92mZipped everything to $HOME/${BUILD_TARGET}-tools-[windows | linux | macos].zip\e[39m"
 }
 
-function installPackagesMac {
-
+#function installPackagesMac {
 #    brew update
 #    brew upgrade
 #    brew install --force coreutils bzip2 flex gperf intltool gdk-pixbuf pcre openssl libtool lzip make p7zip gnu-sed unzip libmpc isl gmp mpfr guile expat zlib gawk gzip
-
-}
+#}
 
 function installPackages {
     echoColor "Installing packages"
