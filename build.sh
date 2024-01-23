@@ -195,7 +195,7 @@ function compile {
     echoColor "    Compiling $name [$platform-$target]"
     mkdir -p build-$name-$version
     cd build-$name-$version
-    configureArgs="--target=$target --disable-nls --prefix=$HOME/$platform-$target/output"
+    configureArgs="--target=$target --disable-nls --enable-lto --prefix=$HOME/$platform-$target/output"
    
     if [ $name == "gcc" ]; then
     configureArgs="--enable-languages=c,c++ --without-headers $configureArgs"
