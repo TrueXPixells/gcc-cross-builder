@@ -195,7 +195,7 @@ function compile {
     echoColor "    Compiling $name [$platform-$target]"
     mkdir -p build-$name-$version
     cd build-$name-$version
-    configureArgs="--target=$target --disable-nls --enable-lto --prefix=$HOME/$platform-$target/output"
+    configureArgs="--target=$target --disable-nls --prefix=$HOME/$platform-$target/output"
    
     if [ $name == "gcc" ]; then
     configureArgs="--enable-languages=c,c++ --without-headers $configureArgs"
@@ -234,7 +234,7 @@ function compile {
     fi
 
     if [[ $name == "gcc" && $target == "x86_64-elf" ]]; then
-        make -j12 all-target-libgcc CFLAGS_FOR_TARGET='-g -O2 -mcmodel=large -mno-red-zone' MAKEINFO=true
+        make -j12 all-target-libgcc CFLAGS_FOR_TARGET='$CFLAGS_FOR_TARGET -mcmodel=large -mno-red-zone' MAKEINFO=true
     else
         make -j12 all-target-libgcc MAKEINFO=true
     fi
