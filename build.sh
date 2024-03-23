@@ -53,7 +53,7 @@ function installPackagesMac {
 #    brew upgrade
 #    brew install --force coreutils bzip2 flex gperf intltool gdk-pixbuf pcre openssl libtool lzip make p7zip gnu-sed unzip libmpc isl gmp mpfr guile expat zlib gawk gzip
     brew install gsed
-    PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"
+    export PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"
 }
 
 function installPackages {
@@ -278,9 +278,9 @@ function compile {
         configureArgs="--with-debuginfod=no --with-guile=no --with-expat=no --with-python=no $configureArgs"
     fi
 
-    #if [[ $platform == "macos" ]]; then
-    #    configureArgs="--with-gmp=/opt/homebrew --with-mpfr=/opt/homebrew --with-mpc=/opt/homebrew --with-isl=/opt/homebrew --with-libiconv-prefix=/opt/homebrew $configureArgs"
-    #fi
+    if [[ $platform == "macos" && $name == "gdb" ]]; then
+        configureArgs="--with-gmp=/opt/homebrew --with-mpfr=/opt/homebrew --with-mpc=/opt/homebrew $configureArgs"
+    fi
 
     if [ $platform == "windows" ]; then
         configureArgs="--host=i686-w64-mingw32.static $configureArgs"
