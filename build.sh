@@ -308,12 +308,7 @@ function compile {
         make -j8 all-target-libgcc MAKEINFO=true >> make.log
     fi
 
-    if [[ $name == "gcc" ]]; then
-    sudo make -j8 install-gcc >> install.log
-    sudo make install-target-libgcc  >> install-libgcc.log
-    else
     sudo make install-exec >> install.log
-    fi
     
     if [[ $name == "gcc" && $target == "x86_64-elf" ]]; then
         if [ $platform == "windows" ]; then
