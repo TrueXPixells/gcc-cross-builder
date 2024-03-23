@@ -62,33 +62,90 @@ function installPackages {
     echoColor "Installing packages"
     sudo apt-get update -y
     sudo apt-get upgrade -y
-    sudo -E DEBIAN_FRONTEND=noninteractive apt-get install -y \
-    autopoint \
-    g++-multilib \
-    gettext \
-    gperf \
-    libtool-bin \
-    intltool \
-    libc6-dev-i386 \
-    libgdk-pixbuf2.0-dev \
-    libltdl-dev \
-    libgl-dev \
-    libpcre3-dev \
-    libxml-parser-perl \
-    lzip \
-    python3-distutils \
-    python3-mako \
-    python3-pkg-resources \
-    sed \
-    build-essential \
-    libmpc-dev \
-    libisl-dev \
-    libgmp-dev \
-    libmpfr-dev \
-    guile-3.0-dev \
-    libexpat1-dev \
-    liblzma-dev \
-    zlib1g-dev
+    #sudo -E DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    #autopoint \
+    #g++-multilib \
+    #gettext \
+    #gperf \
+    #libtool-bin \
+    #intltool \
+    #libc6-dev-i386 \
+    #libgdk-pixbuf2.0-dev \
+    #libltdl-dev \
+    #libgl-dev \
+    #libpcre3-dev \
+    #libxml-parser-perl \
+    #lzip \
+    #python3-distutils \
+    #python3-mako \
+    #python3-pkg-resources \
+    #sed \
+    #build-essential \
+    #libmpc-dev \
+    #libisl-dev \
+    #libgmp-dev \
+    #libmpfr-dev \
+    #guile-3.0-dev \
+    #libexpat1-dev \
+    #liblzma-dev \
+    #zlib1g-dev
+
+        pkgList=(
+        libgl-dev
+        libpcre3-dev
+        python3-distutils
+        python3-pkg-resources
+        build-essential
+        libmpc-dev
+        libisl-dev
+        libmpfr-dev
+        guile-3.0-dev
+        libexpat1-dev
+        liblzma-dev
+        zlib1g-dev
+
+        git
+        autoconf
+        automake
+        autopoint
+        bash
+        bison
+        bzip2
+        flex
+        gettext
+        g++
+        gperf
+        intltool
+        libffi-dev
+        libgdk-pixbuf2.0-dev
+        libgmp-dev
+        libtool
+        libltdl-dev
+        libssl-dev
+        libxml-parser-perl
+        make
+        python3-mako
+        openssl
+        p7zip-full
+        patch
+        perl
+        pkg-config
+        ruby
+        scons
+        sed
+        unzip
+        wget
+        xz-utils
+        libtool-bin
+        texinfo
+        g++-multilib
+        lzip 
+        python3 python-is-python3
+        )
+
+    for pkg in ${pkgList[@]}; do
+        sudo -E DEBIAN_FRONTEND=noninteractive apt-get -qq install $pkg -y
+    done
 }
 
 function installMXE {
@@ -203,10 +260,10 @@ function compile {
     if [ $name == "gcc" ]; then
     configureArgs="--enable-languages=c,c++ --without-headers $configureArgs"
     else
-    configureArgs="--with-sysroot $configureArgs"
+    configureArgs="--with-sysroot --disable-werror $configureArgs"
     fi
     
-    if [ $name == "binutils" ]; then
+    if [ $name == "binutilsx" ]; then
     if [[ $target == "i386-elf" || $target == "i686-elf" || $target == "x86_64-elf" ]]; then
         configureArgs="--enable-targets=x86_64-pep $configureArgs"
     fi
@@ -227,10 +284,6 @@ function compile {
     if [[ $name == "gcc" || $name == "gdb" ]]; then
         configureArgs="--with-gmp=$(brew-path gmp) --with-mpfr=$(brew-path mpfr) --with-mpc=$(brew-path mpc) $configureArgs"
     fi
-    fi
-
-    if [[ $name == "binutils" || $name == "gdb" ]]; then
-        configureArgs="--disable-werror $configureArgs"
     fi
 
     if [ $platform == "windows" ]; then
