@@ -236,28 +236,28 @@ function compile {
 
     ../$name-$version/configure $configureArgs
     if [ $name == "gcc" ]; then
-        make -j12 all-gcc MAKEINFO=true
+        make -j12 all-gcc MAKEINFO=true >> configure.log
     else
-        make -j12 MAKEINFO=true
+        make -j12 MAKEINFO=true  >> configure.log
     fi
 
     if [[ $name == "gcc" && $target == "x86_64-elf" ]]; then
-        make -j12 all-target-libgcc CFLAGS_FOR_TARGET='$CFLAGS_FOR_TARGET -mcmodel=large -mno-red-zone' MAKEINFO=true
+        make -j12 all-target-libgcc CFLAGS_FOR_TARGET='$CFLAGS_FOR_TARGET -mcmodel=large -mno-red-zone' MAKEINFO=true >> make.log
     else
-        make -j12 all-target-libgcc MAKEINFO=true
+        make -j12 all-target-libgcc MAKEINFO=true >> make.log
     fi
 
     if [[ $name == "gcc" ]]; then
-    sudo make -j12 install-gcc MAKEINFO=true
-    sudo make install-target-libgcc MAKEINFO=true
+    sudo make -j12 install-gcc MAKEINFO=true >> install.log
+    sudo make install-target-libgcc MAKEINFO=true >> install-libgcc.log
     else
-    sudo make install MAKEINFO=true
+    sudo make install MAKEINFO=true >> install.log
     fi
     
     if [[ $name == "gcc" && $target == "x86_64-elf" ]]; then
         if [ $platform == "windows" ]; then
             cd "${BUILD_TARGET}/no-red-zone/libgcc"
-            sudo make install MAKEINFO=true
+            sudo make install MAKEINFO=true >> windows-install-libgcc.log
             cd ../../..
         fi
         if [[ ! -d "../output/lib/gcc/x86_64-elf/$version/no-red-zone" ]]; then
