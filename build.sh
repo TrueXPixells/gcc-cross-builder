@@ -54,11 +54,7 @@ function installPackagesMac {
 #    brew update
 #    brew upgrade
 #    brew install --force coreutils bzip2 flex gperf intltool gdk-pixbuf pcre openssl libtool lzip make p7zip gnu-sed unzip libmpc isl gmp mpfr guile expat zlib gawk gzip
-    brew install gsed guile gmp mpfr libmpc
-    echo "aaaaaaaaaaaa"
-    ls /opt/homebrew/include
-    echo "bbbbbbbbbbbb"
-    ls /usr/local/opt/gnu-sed
+    brew install gsed gmp mpfr libmpc
     PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"
 }
 
@@ -286,7 +282,7 @@ function compile {
 
     if [[ $platform == "macos" ]]; then
     if [[ $name == "gcc" || $name == "gdb" ]]; then
-        configureArgs="--with-gmp=$(brew-path gmp) --with-mpfr=$(brew-path mpfr) --with-mpc=$(brew-path mpc) $configureArgs"
+        configureArgs="--with-gmp=/opt/homebrew --with-mpfr=/opt/homebrew --with-mpc=/opt/homebrew $configureArgs"
     fi
     fi
 
