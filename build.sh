@@ -53,7 +53,6 @@ function installPackagesMac {
 #    brew upgrade
 #    brew install --force coreutils bzip2 flex gperf intltool gdk-pixbuf pcre openssl libtool lzip make p7zip gnu-sed unzip libmpc isl gmp mpfr guile expat zlib gawk gzip
     brew install gsed
-    export PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"
 }
 
 function installPackages {
@@ -286,11 +285,16 @@ function compile {
         configureArgs="--host=i686-w64-mingw32.static $configureArgs"
     fi
     
+    if [ $ON_MAC != true ]; then
+        alias gsed=sed
+    fi    
+    
     if [[ $name == "gcc" && $target == "x86_64-elf" ]]; then
+
         echoColor "        Installing config/i386/t-x86_64-elf"
         echo -e "MULTILIB_OPTIONS += mno-red-zone\nMULTILIB_DIRNAMES += no-red-zone" > ../gcc-$GCC_VERSION/gcc/config/i386/t-x86_64-elf
         echoColor "        Patching gcc/config.gcc"
-        sed -i '/x86_64-\*-elf\*)/a \\ttmake_file="${tmake_file} i386/t-x86_64-elf"' ../gcc-$GCC_VERSION/gcc/config.gcc
+        gsed -i '/x86_64-\*-elf\*)/a \\ttmake_file="${tmake_file} i386/t-x86_64-elf"' ../gcc-$GCC_VERSION/gcc/config.gcc
     fi
 
     ../$name-$version/configure $configureArgs
