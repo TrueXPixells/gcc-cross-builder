@@ -21,7 +21,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 ON_MAC=true
 fi
 
-GCC_VERSION="13.2.1"
+GCC_VERSION="13.2.0"
 BINUTILS_VERSION="2.42"
 GDB_VERSION="14.2"
 
