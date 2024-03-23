@@ -52,9 +52,8 @@ function installPackagesMac {
 #    brew update
 #    brew upgrade
 #    brew install --force coreutils bzip2 flex gperf intltool gdk-pixbuf pcre openssl libtool lzip make p7zip gnu-sed unzip libmpc isl gmp mpfr guile expat zlib gawk gzip
-    brew install gsed guile gmp mpfr
+    brew install gsed guile gmp mpfr mpc
     PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"
-    xcode-select --install
 }
 
 function installPackages {
@@ -219,8 +218,15 @@ function compile {
     fi
     fi
 
+    #--with-guile=/usr/local --with-expat --with-lzma
     if [ $name == "gdb" ]; then
-        configureArgs="--with-expat --with-lzma --with-python=no --with-guile $configureArgs"
+        configureArgs="--with-python=no $configureArgs"
+    fi
+
+    if [[ $platform == "macos" ]]; then
+    if [[ $name == "gcc" || $name == "gdb" ]]; then
+        configureArgs="--with-gmp=/usr/local --with-mpfr=/usr/local --with-mpc=/usr/local $configureArgs"
+    fi
     fi
 
     if [[ $name == "binutils" || $name == "gdb" ]]; then
