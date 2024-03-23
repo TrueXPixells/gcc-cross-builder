@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 set -e
-set -x
 
 while [[ $# -gt 0 ]]
 do
@@ -55,6 +54,7 @@ function installPackagesMac {
 #    brew install --force coreutils bzip2 flex gperf intltool gdk-pixbuf pcre openssl libtool lzip make p7zip gnu-sed unzip libmpc isl gmp mpfr guile expat zlib gawk gzip
     brew install gsed guile
     PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"
+    xcode-select --install
 }
 
 function installPackages {
@@ -223,7 +223,7 @@ function compile {
         configureArgs="--with-expat --with-lzma --with-python=no --with-guile $configureArgs"
     fi
 
-    if [ $name == "binutils" || $name == "gdb" ]; then
+    if [[ $name == "binutils" || $name == "gdb" ]]; then
         configureArgs="--disable-werror $configureArgs"
     fi
 
