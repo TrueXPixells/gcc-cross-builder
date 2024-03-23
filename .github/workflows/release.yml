@@ -49,16 +49,16 @@ jobs:
           asset_path: /home/runner/${{ matrix.arch }}-tools-linux.zip
           asset_name: ${{ matrix.arch }}-tools-linux.zip
           asset_content_type: application/zip
-      - name: release win
-        if: ${{ matrix.platform != 'macos-14' }}
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: /home/runner/${{ matrix.arch }}-tools-windows.zip
-          asset_name: ${{ matrix.arch }}-tools-windows.zip
-          asset_content_type: application/zip
+      #- name: release win
+      #  if: ${{ matrix.platform != 'macos-14' }}
+      #  uses: actions/upload-release-asset@v1
+      #  env:
+      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #  with:
+      #    upload_url: ${{ needs.release.outputs.upload_url }}
+      #    asset_path: /home/runner/${{ matrix.arch }}-tools-windows.zip
+      #    asset_name: ${{ matrix.arch }}-tools-windows.zip
+      #    asset_content_type: application/zip
       - name: release mac
         if: ${{ matrix.platform == 'macos-14' }}
         uses: actions/upload-release-asset@v1
