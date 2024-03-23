@@ -96,7 +96,7 @@ function installMXE {
         cd /opt
         sudo -E git clone https://github.com/mxe/mxe.git
         cd mxe
-        sudo make -j12 gcc gmp
+        sudo make -j8 gcc gmp
         sudo rm -rf .ccache plugins src ext pkg log tools docs .github
         sudo find /opt/mxe
         PATH="/opt/mxe/usr/bin:$PATH"
@@ -176,7 +176,7 @@ function compileAll {
     echoColor "Compiling all $platform"
     cd $HOME/$platform-$target
     mkdir -p output
-    PATH="$HOME/$platform-$target/output/bin:$PATH"
+    export PATH="$HOME/$platform-$target/output/bin:$PATH"
     compile binutils $BINUTILS_VERSION $platform $target
     compile gcc $GCC_VERSION $platform $target
     compile gdb $GDB_VERSION $platform $target
@@ -223,7 +223,7 @@ function compile {
 
     if [[ $platform == "macos" ]]; then
     if [[ $name == "gcc" || $name == "gdb" ]]; then
-        configureArgs="--with-gmp=/usr/local --with-mpfr=/usr/local --with-mpc=/usr/local $configureArgs"
+        configureArgs="--with-gmp=$(brew-path gmp) --with-mpfr=$(brew-path mpfr) --with-mpc=$(brew-path mpc) $configureArgs"
     fi
     fi
 
@@ -239,27 +239,25 @@ function compile {
         echoColor "        Installing config/i386/t-x86_64-elf"
         echo -e "MULTILIB_OPTIONS += mno-red-zone\nMULTILIB_DIRNAMES += no-red-zone" > ../gcc-$GCC_VERSION/gcc/config/i386/t-x86_64-elf
         echoColor "        Patching gcc/config.gcc"
-        sed -i '/x86_64-\*-elf\*)/a \\ttmake_file="${tmake_file} i386/t-x86_64-elf" # include the new multilib configuration' ../gcc-$GCC_VERSION/gcc/config.gcc
+        sed -i '/x86_64-\*-elf\*)/a \\ttmake_file="${tmake_file} i386/t-x86_64-elf"' ../gcc-$GCC_VERSION/gcc/config.gcc
     fi
 
     ../$name-$version/configure $configureArgs
     if [ $name == "gcc" ]; then
-        make -j12 all-gcc MAKEINFO=true >> configure.log
+        make -j8 all-gcc MAKEINFO=true >> configure.log
     else
-        make -j12 MAKEINFO=true  >> configure.log
+        make -j8 MAKEINFO=true  >> configure.log
     fi
 
     if [[ $name == "gcc" && $target == "x86_64-elf" ]]; then
-        make -j12 all-target-libgcc CFLAGS_FOR_TARGET='$CFLAGS_FOR_TARGET -mcmodel=large -mno-red-zone' MAKEINFO=true >> make.log
+        make -j8 all-target-libgcc CFLAGS_FOR_TARGET='$CFLAGS_FOR_TARGET -mcmodel=large -mno-red-zone' MAKEINFO=true >> make.log
     else
-        make -j12 all-target-libgcc MAKEINFO=true >> make.log
+        make -j8 all-target-libgcc MAKEINFO=true >> make.log
     fi
 
     if [[ $name == "gcc" ]]; then
-    sudo make -j12 install-gcc MAKEINFO=true >> install.log
+    sudo make -j8 install-gcc MAKEINFO=true >> install.log
     sudo make install-target-libgcc MAKEINFO=true >> install-libgcc.log
-    sudo cat config.log
-    exit 1
     else
     sudo make install MAKEINFO=true >> install.log
     fi
