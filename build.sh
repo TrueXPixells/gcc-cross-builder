@@ -30,8 +30,6 @@ echo "GCC_VERSION      = ${GCC_VERSION}"
 echo "GDB_VERSION      = ${GDB_VERSION}"
 echo "PATH             = ${PATH}"
 
-brew-path() { brew info $1 | head -n3 | tail -n1 | cut -d' ' -f1; }
-
 function main {
     if [ $ON_MAC == true ]; then
         installPackagesMac
@@ -275,14 +273,14 @@ function compile {
     fi
     fi
 
-    #--with-guile=/usr/local --with-expat --with-lzma
+    #--with-lzma
     if [ $name == "gdb" ]; then
-        configureArgs="--with-python=no $configureArgs"
+        configureArgs="--with-debuginfod=no --with-guile=no --with-expat=no --with-python=no $configureArgs"
     fi
 
-    if [[ $platform == "macos" ]]; then
-        configureArgs="--with-gmp=/opt/homebrew --with-mpfr=/opt/homebrew --with-mpc=/opt/homebrew --with-isl=/opt/homebrew --with-libiconv-prefix=/opt/homebrew $configureArgs"
-    fi
+    #if [[ $platform == "macos" ]]; then
+    #    configureArgs="--with-gmp=/opt/homebrew --with-mpfr=/opt/homebrew --with-mpc=/opt/homebrew --with-isl=/opt/homebrew --with-libiconv-prefix=/opt/homebrew $configureArgs"
+    #fi
 
     if [ $platform == "windows" ]; then
         configureArgs="--host=i686-w64-mingw32.static $configureArgs"
