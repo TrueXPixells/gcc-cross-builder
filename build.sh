@@ -32,7 +32,6 @@ function main {
         installPackagesMac
     else
         installPackages
-        installMXE
     fi
 
     downloadSources $BUILD_TARGET
@@ -40,6 +39,7 @@ function main {
         compileAll "macos" $BUILD_TARGET
     else
         compileAll "linux" $BUILD_TARGET
+        installMXE
         compileAll "windows" $BUILD_TARGET
     fi
     echo -e "\e[92mZipped everything to $HOME/${BUILD_TARGET}-tools-[windows | linux | macos].zip\e[39m"
@@ -216,7 +216,11 @@ function compile {
     fi
 
     if [ $name == "gdb" ]; then
-        configureArgs="--with-expat --with-lzma --with-python=no --with-guile"
+        configureArgs="--with-expat --with-lzma --with-python=no --with-guile $configureArgs"
+    fi
+
+    if [ $name == "binutils" || $name == "gdb" ]; then
+        configureArgs="--disable-werror $configureArgs"
     fi
 
     if [ $platform == "windows" ]; then
