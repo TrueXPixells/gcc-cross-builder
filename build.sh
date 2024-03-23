@@ -307,16 +307,16 @@ function compile {
     fi
 
     if [[ $name == "gcc" ]]; then
-    sudo make -j8 install-gcc >> install.log
-    sudo make install-target-libgcc  >> install-libgcc.log
+    sudo make -j8 install-gcc MAKEINFO=true >> install.log
+    sudo make install-target-libgcc MAKEINFO=true >> install-libgcc.log
     else
-    sudo make install >> install.log
+    sudo make install MAKEINFO=true >> install.log
     fi
     
     if [[ $name == "gcc" && $target == "x86_64-elf" ]]; then
         if [ $platform == "windows" ]; then
             cd "${BUILD_TARGET}/no-red-zone/libgcc"
-            sudo make install >> windows-install-libgcc.log
+            sudo make install MAKEINFO=true >> windows-install-libgcc.log
             cd ../../..
         fi
         if [[ ! -d "../output/lib/gcc/x86_64-elf/$version/no-red-zone" ]]; then
