@@ -56,9 +56,9 @@ function installPackagesMac {
 #    brew install --force coreutils bzip2 flex gperf intltool gdk-pixbuf pcre openssl libtool lzip make p7zip gnu-sed unzip libmpc isl gmp mpfr guile expat zlib gawk gzip
     brew install gsed guile gmp mpfr libmpc
     echo "aaaaaaaaaaaa"
-    ls /opt/homebrew/
+    ls /opt/homebrew/include
     echo "bbbbbbbbbbbb"
-    ls /usr/local/opt
+    ls /usr/local/opt/gnu-sed
     PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"
 }
 
