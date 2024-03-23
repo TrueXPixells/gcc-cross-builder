@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set +e
+set -e
 
 while [[ $# -gt 0 ]]
 do
@@ -29,6 +29,8 @@ echo "BINUTILS_VERSION = ${BINUTILS_VERSION}"
 echo "GCC_VERSION      = ${GCC_VERSION}"
 echo "GDB_VERSION      = ${GDB_VERSION}"
 echo "PATH             = ${PATH}"
+
+brew-path() { brew info $1 | head -n3 | tail -n1 | cut -d' ' -f1; }
 
 function main {
     if [ $ON_MAC == true ]; then
