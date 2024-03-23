@@ -82,9 +82,7 @@ function installPackages {
     libmpc-dev \
     libisl-dev \
     libgmp-dev \
-    libgmp10 \
     libmpfr-dev \
-    libmpfr6 \
     guile-3.0-dev \
     libexpat1-dev \
     liblzma-dev \
