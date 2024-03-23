@@ -281,9 +281,7 @@ function compile {
     fi
 
     if [[ $platform == "macos" ]]; then
-    if [[ $name == "gcc" || $name == "gdb" ]]; then
-        configureArgs="--with-gmp=/opt/homebrew --with-mpfr=/opt/homebrew --with-mpc=/opt/homebrew $configureArgs"
-    fi
+        configureArgs="--with-gmp=/opt/homebrew --with-mpfr=/opt/homebrew --with-mpc=/opt/homebrew --with-isl=/opt/homebrew --with-libiconv-prefix=/opt/homebrew $configureArgs"
     fi
 
     if [ $platform == "windows" ]; then
