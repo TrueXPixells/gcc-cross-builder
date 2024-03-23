@@ -20,7 +20,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: rel
-          release_name: GCC ${{ inputs.gcc_version }} Binutils ${{ inputs.binutils_version }} GDB ${{ inputs.gdb_version }}
+          release_name: Build
     outputs:
       upload_url: ${{ steps.release.outputs.upload_url }}
   build:
@@ -39,7 +39,6 @@ jobs:
           cd $GITHUB_WORKSPACE 
           chmod +x build.sh
           ./build.sh -t "${{ matrix.arch }}"
-#          docker run -v "${{ github.workspace }}:/root" --rm truexpixels/elf-tools -t "${{ matrix.arch }}" -gv ${{ inputs.gcc_version }} -bv ${{ inputs.binutils_version }} -dv ${{ inputs.gdb_version }}
       - name: release linux
         uses: actions/upload-release-asset@v1
         if: ${{ matrix.platform != 'macos-14' }}
