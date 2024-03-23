@@ -215,6 +215,10 @@ function compile {
     fi
     fi
 
+    if [ $name == "gdb" ]; then
+        configureArgs="--with-expat --with-lzma --with-python=no --with-guile"
+    fi
+
     if [ $platform == "windows" ]; then
         configureArgs="--host=i686-w64-mingw32.static $configureArgs"
     fi
