@@ -20,7 +20,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 ON_MAC=true
 fi
 
-GCC_VERSION="13.1.0"
+GCC_VERSION="13.2.0"
 BINUTILS_VERSION="2.42"
 GDB_VERSION="14.2"
 
@@ -303,7 +303,7 @@ function compile {
     fi
 
     if [[ $name == "gcc" && $target == "x86_64-elf" ]]; then
-        make -j8 all-target-libgcc CFLAGS_FOR_TARGET='$CFLAGS_FOR_TARGET -mcmodel=large -mno-red-zone' MAKEINFO=true >> make.log
+        make -j8 all-target-libgcc CFLAGS_FOR_TARGET='-g -O2 -mcmodel=large -mno-red-zone' MAKEINFO=true >> make.log
     else
         make -j8 all-target-libgcc MAKEINFO=true >> make.log
     fi
