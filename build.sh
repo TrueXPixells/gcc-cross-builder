@@ -21,6 +21,10 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 ON_MAC=true
 fi
 
+GCC_VERSION="13.2.1"
+BINUTILS_VERSION="2.42"
+GDB_VERSION="14.2"
+
 echo "BUILD_TARGET     = ${BUILD_TARGET}"
 echo "BINUTILS_VERSION = ${BINUTILS_VERSION}"
 echo "GCC_VERSION      = ${GCC_VERSION}"
