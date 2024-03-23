@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+set +e
 
 while [[ $# -gt 0 ]]
 do
@@ -259,6 +259,7 @@ function compile {
     sudo make -j12 install-gcc MAKEINFO=true >> install.log
     sudo make install-target-libgcc MAKEINFO=true >> install-libgcc.log
     sudo cat config.log
+    exit 1
     else
     sudo make install MAKEINFO=true >> install.log
     fi
