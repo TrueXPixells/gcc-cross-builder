@@ -51,8 +51,7 @@ function main {
 function installPackagesMac {
 #    brew update
 #    brew upgrade
-    brew install gsed expat guile gmp mpfr mpc
-    ls /usr/local/opt/guile
+    brew install gsed expat guile gmp mpfr mpc gtar
 }
 
 function installPackages {
@@ -157,7 +156,11 @@ function compileAll {
     cd ..
     if [[ -d "$HOME/$platform-$target/output" ]]; then
         cd $HOME/$platform-$target/output
-        zip -r "$HOME/$target-tools-$1.zip" *
+        if [[ $ON_MAC == true ]]; then
+            gtar -cJvf "$HOME/$target-tools-$1.tar.xz" *
+        else
+             tar -cJvf "$HOME/$target-tools-$1.tar.xz" *
+        fi
     fi
 #    sudo rm -rf $HOME/$platform-$target
 }
