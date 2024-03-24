@@ -31,7 +31,7 @@ jobs:
         with:
           upload_url: ${{ github.event.release.upload_url }}
           asset_path: /home/runner/${{ matrix.arch }}-tools-linux.tar.xz
-          asset_name: ${{ matrix.arch }}-tools-linux.zip
+          asset_name: ${{ matrix.arch }}-tools-linux.tar.xz
           asset_content_type: application/zip
       #- name: release win
       #  if: ${{ matrix.platform != 'macos-14' }}
@@ -51,5 +51,5 @@ jobs:
         with:
           upload_url: ${{ github.event.release.upload_url }}
           asset_path: /Users/runner/${{ matrix.arch }}-tools-macos.tar.xz
-          asset_name: ${{ matrix.arch }}-tools-macos.zip
+          asset_name: ${{ matrix.arch }}-tools-macos.tar.xz
           asset_content_type: application/zip        
