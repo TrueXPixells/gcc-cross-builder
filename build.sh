@@ -278,7 +278,7 @@ function compile {
     fi
 
     if [[ $platform == "macos" && $name == "gdb" ]]; then
-        configureArgs="--with-guile=/opt/homebrew --with-expat=/opt/homebrew --with-gmp=/opt/homebrew --with-mpfr=/opt/homebrew --with-mpc=/opt/homebrew $configureArgs"
+        configureArgs="--with-guile=/opt/homebrew --with-expat=/opt/homebrew/opt/expat --with-gmp=/opt/homebrew --with-mpfr=/opt/homebrew --with-mpc=/opt/homebrew $configureArgs"
     fi
 
     if [ $platform == "windows" ]; then
