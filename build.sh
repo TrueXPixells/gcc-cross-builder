@@ -22,7 +22,7 @@ fi
 
 GCC_VERSION="13.2.0"
 BINUTILS_VERSION="2.42"
-GDB_VERSION="14.2"
+GDB_VERSION="13.2"
 
 echo "BUILD_TARGET     = ${BUILD_TARGET}"
 echo "BINUTILS_VERSION = ${BINUTILS_VERSION}"
@@ -42,8 +42,8 @@ function main {
         compileAll "macos" $BUILD_TARGET
     else
         compileAll "linux" $BUILD_TARGET
-        #installMXE
-        #compileAll "windows" $BUILD_TARGET
+        installMXE
+        compileAll "windows" $BUILD_TARGET
     fi
     echo -e "\e[92mZipped everything to $HOME/${BUILD_TARGET}-tools-[windows | linux | macos].zip\e[39m"
 }
