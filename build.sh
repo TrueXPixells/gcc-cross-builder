@@ -42,8 +42,8 @@ function main {
         compileAll "macos" $BUILD_TARGET
     else
         compileAll "linux" $BUILD_TARGET
-        installMXE
-        compileAll "windows" $BUILD_TARGET
+        #installMXE
+        #compileAll "windows" $BUILD_TARGET
     fi
     echo -e "\e[92mZipped everything to $HOME/${BUILD_TARGET}-tools-[windows | linux | macos].zip\e[39m"
 }
@@ -53,6 +53,8 @@ function installPackagesMac {
 #    brew upgrade
 #    brew install --force coreutils bzip2 flex gperf intltool gdk-pixbuf pcre openssl libtool lzip make p7zip gnu-sed unzip libmpc isl gmp mpfr guile expat zlib gawk gzip
     brew install gsed expat guile
+    ls /opt/homebrew/Cellar/guile/3.0.9
+    exit 1
 }
 
 function installPackages {
