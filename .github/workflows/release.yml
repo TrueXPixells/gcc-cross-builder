@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         arch: [x86_64-elf, i386-elf, i686-elf, riscv64-elf, arm-none-eabi, avr]
-        platform: [ubuntu-latest, macos-14]
+        platform: [ubuntu-latest, macos-14-large]
     name: ${{ matrix.arch }}
     runs-on: ${{ matrix.platform }}
     steps:
