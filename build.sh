@@ -59,90 +59,8 @@ function installPackages {
     echoColor "Installing packages"
     sudo apt-get update -y
     sudo apt-get upgrade -y
-    #sudo -E DEBIAN_FRONTEND=noninteractive apt-get install -y \
-    #autopoint \
-    #g++-multilib \
-    #gettext \
-    #gperf \
-    #libtool-bin \
-    #intltool \
-    #libc6-dev-i386 \
-    #libgdk-pixbuf2.0-dev \
-    #libltdl-dev \
-    #libgl-dev \
-    #libpcre3-dev \
-    #libxml-parser-perl \
-    #lzip \
-    #python3-distutils \
-    #python3-mako \
-    #python3-pkg-resources \
-    #sed \
-    #build-essential \
-    #libmpc-dev \
-    #libisl-dev \
-    #libgmp-dev \
-    #libmpfr-dev \
-    #guile-3.0-dev \
-    #libexpat1-dev \
-    #liblzma-dev \
-    #zlib1g-dev
-
-        pkgList=(
-        libgl-dev
-        libpcre3-dev
-        python3-distutils
-        python3-pkg-resources
-        build-essential
-        libmpc-dev
-        libisl-dev
-        libmpfr-dev
-        guile-3.0-dev
-        libexpat1-dev
-        liblzma-dev
-        zlib1g-dev
-
-        git
-        autoconf
-        automake
-        autopoint
-        bash
-        bison
-        bzip2
-        flex
-        gettext
-        g++
-        gperf
-        intltool
-        libffi-dev
-        libgdk-pixbuf2.0-dev
-        libgmp-dev
-        libtool
-        libltdl-dev
-        libssl-dev
-        libxml-parser-perl
-        make
-        python3-mako
-        openssl
-        p7zip-full
-        patch
-        perl
-        pkg-config
-        ruby
-        scons
-        sed
-        unzip
-        wget
-        xz-utils
-        libtool-bin
-        texinfo
-        g++-multilib
-        lzip 
-        python3 python-is-python3
-        )
-
-    for pkg in ${pkgList[@]}; do
-        sudo -E DEBIAN_FRONTEND=noninteractive apt-get -qq install $pkg -y
-    done
+    #Sphinx diffutils (py mod) gm2 gdc gnat python
+    sudo -E DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential gawk bash gcc g++ binutils gzip bzip2 make tar perl liblzma-dev zlib1g-dev libc6-dev libgmp-dev libmpfr-dev libmpc-dev libisl-dev zstd gettext texinfo autoconf automake autogen guile-3.0-dev flex git ssh patch tcl expect dejagnu m4
 }
 
 function installMXE {
@@ -260,7 +178,7 @@ function compile {
     configureArgs="--with-sysroot --disable-werror $configureArgs"
     fi
     
-    if [ $name == "binutilsx" ]; then
+    if [ $name == "binutils" ]; then
     if [[ $target == "i386-elf" || $target == "i686-elf" || $target == "x86_64-elf" ]]; then
         configureArgs="--enable-targets=x86_64-pep $configureArgs"
     fi
@@ -274,11 +192,11 @@ function compile {
 
     #--with-lzma
     if [ $name == "gdb" ]; then
-        configureArgs="--with-debuginfod=no --with-python=no $configureArgs"
+        configureArgs="--with-python=no $configureArgs"
     fi
 
     if [[ $platform == "macos" && $name == "gdb" ]]; then
-        configureArgs="--with-guile=/opt/homebrew/Cellar/guile/3.0.9 --with-expat=/opt/homebrew/opt/expat --with-gmp=/opt/homebrew --with-mpfr=/opt/homebrew --with-mpc=/opt/homebrew $configureArgs"
+        configureArgs="--with-expat=/opt/homebrew/opt/expat --with-gmp=/opt/homebrew --with-mpfr=/opt/homebrew --with-mpc=/opt/homebrew $configureArgs"
     fi
 
     if [ $platform == "windows" ]; then
@@ -320,7 +238,7 @@ function compile {
     
     if [[ $name == "gcc" && $target == "x86_64-elf" ]]; then
         if [ $platform == "windows" ]; then
-            cd "${BUILD_TARGET}/no-red-zone/libgcc"
+            cd "$target/no-red-zone/libgcc"
             sudo make install MAKEINFO=true >> windows-install-libgcc.log
             cd ../../..
         fi
