@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [i386-elf, i686-elf, x86_64-elf, aarch64-elf, riscv64-elf, arm-none-eabi, avr]
+        arch: [x86-elf, aarch64-elf, riscv64-elf, arm-none-eabi, avr]
         platform: [ubuntu-latest, macos-14]
     name: ${{ matrix.arch }}
     runs-on: ${{ matrix.platform }}
