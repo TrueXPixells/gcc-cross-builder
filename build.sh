@@ -52,6 +52,7 @@ function installPackagesMac {
 #    brew update
 #    brew upgrade
     brew install gsed expat guile gmp mpfr mpc
+    ls /usr/local/opt/guile
 }
 
 function installPackages {
@@ -195,7 +196,7 @@ function compile {
     fi
 
     if [[ $platform == "macos" && $name == "gdb" ]]; then
-        configureArgs="--with-guile=/usr/local --with-expat=/usr/local/opt/expat --with-gmp=/usr/local --with-mpfr=/usr/local --with-mpc=/usr/local $configureArgs"
+        configureArgs="--with-guile=/usr/local/opt/guile --with-expat=/usr/local/opt/expat --with-gmp=/usr/local --with-mpfr=/usr/local --with-mpc=/usr/local $configureArgs"
     fi
 
     if [ $platform == "windows" ]; then
