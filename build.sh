@@ -51,7 +51,7 @@ function main {
 function installPackagesMac {
 #    brew update
 #    brew upgrade
-    brew install gsed expat guile gmp mpfr mpc gtar
+    brew install gsed expat guile gmp mpfr mpc gnu-tar
 }
 
 function installPackages {
