@@ -199,7 +199,8 @@ function compile {
     fi
 
     if [[ $platform == "macos" && $name == "gdb" ]]; then
-        configureArgs="--with-guile=/usr/local/opt/guile --with-expat=/usr/local/opt/expat --with-gmp=/usr/local --with-mpfr=/usr/local --with-mpc=/usr/local $configureArgs"
+        #Annoying guile
+        configureArgs="--with-guile=no --with-expat=/usr/local/opt/expat --with-gmp=/usr/local --with-mpfr=/usr/local --with-mpc=/usr/local $configureArgs"
     fi
 
     if [ $platform == "windows" ]; then
