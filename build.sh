@@ -60,7 +60,7 @@ function installPackages {
     sudo apt-get update -y
     sudo apt-get upgrade -y
     #Sphinx diffutils (py mod) gm2 gdc gnat python
-    sudo -E DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential gawk bash gcc g++ binutils gzip bzip2 make tar perl liblzma-dev zlib1g-dev libc6-dev libgmp-dev libmpfr-dev libmpc-dev libisl-dev zstd gettext texinfo autoconf automake autogen guile-3.0-dev flex git ssh patch tcl expect dejagnu m4
+    sudo -E DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential gawk bash gcc g++ binutils gzip bzip2 make tar perl libdebuginfod-dev liblzma-dev zlib1g-dev libc6-dev libgmp-dev libmpfr-dev libmpc-dev libisl-dev zstd gettext texinfo autoconf automake autogen guile-3.0-dev flex git ssh patch tcl expect dejagnu m4
 }
 
 function installMXE {
