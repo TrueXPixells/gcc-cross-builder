@@ -42,8 +42,8 @@ function main {
         compileAll "macos" $BUILD_TARGET
     else
         compileAll "linux" $BUILD_TARGET
-        installMXE
-        compileAll "windows" $BUILD_TARGET
+        #installMXE
+        #compileAll "windows" $BUILD_TARGET
     fi
     echo -e "\e[92mZipped everything to $HOME/${BUILD_TARGET}-tools-[windows | linux | macos].zip\e[39m"
 }
