@@ -42,8 +42,8 @@ function main {
         compileAll "macos" $BUILD_TARGET
     else
         compileAll "linux" $BUILD_TARGET
-        #installMXE
-        #compileAll "windows" $BUILD_TARGET
+        installMXE
+        compileAll "windows" $BUILD_TARGET
     fi
     echo -e "\e[92mZipped everything to $HOME/${BUILD_TARGET}-tools-[windows | linux | macos].zip\e[39m"
 }
@@ -52,7 +52,7 @@ function installPackagesMac {
 #    brew update
 #    brew upgrade
 #    brew install --force coreutils bzip2 flex gperf intltool gdk-pixbuf pcre openssl libtool lzip make p7zip gnu-sed unzip libmpc isl gmp mpfr guile expat zlib gawk gzip
-    brew install gsed
+    brew install gsed expat guile
 }
 
 function installPackages {
@@ -274,27 +274,26 @@ function compile {
 
     #--with-lzma
     if [ $name == "gdb" ]; then
-        configureArgs="--with-debuginfod=no --with-guile=no --with-expat=no --with-python=no $configureArgs"
+        configureArgs="--with-debuginfod=no --with-python=no $configureArgs"
     fi
 
     if [[ $platform == "macos" && $name == "gdb" ]]; then
-        configureArgs="--with-gmp=/opt/homebrew --with-mpfr=/opt/homebrew --with-mpc=/opt/homebrew $configureArgs"
+        configureArgs="--with-guile=/opt/homebrew --with-expat=/opt/homebrew --with-gmp=/opt/homebrew --with-mpfr=/opt/homebrew --with-mpc=/opt/homebrew $configureArgs"
     fi
 
     if [ $platform == "windows" ]; then
         configureArgs="--host=i686-w64-mingw32.static $configureArgs"
     fi
     
-    if [ $ON_MAC != true ]; then
-        alias gsed=sed
-    fi    
-    
     if [[ $name == "gcc" && $target == "x86_64-elf" ]]; then
-
         echoColor "        Installing config/i386/t-x86_64-elf"
         echo -e "MULTILIB_OPTIONS += mno-red-zone\nMULTILIB_DIRNAMES += no-red-zone" > ../gcc-$GCC_VERSION/gcc/config/i386/t-x86_64-elf
         echoColor "        Patching gcc/config.gcc"
-        gsed -i '/x86_64-\*-elf\*)/a \\ttmake_file="${tmake_file} i386/t-x86_64-elf"' ../gcc-$GCC_VERSION/gcc/config.gcc
+        if [[ $ON_MAC == true ]]; then
+            gsed -i '/x86_64-\*-elf\*)/a \\ttmake_file="${tmake_file} i386/t-x86_64-elf"' ../gcc-$GCC_VERSION/gcc/config.gcc
+        else
+             sed -i '/x86_64-\*-elf\*)/a \\ttmake_file="${tmake_file} i386/t-x86_64-elf"' ../gcc-$GCC_VERSION/gcc/config.gcc
+        fi
     fi
 
     ../$name-$version/configure $configureArgs
@@ -304,10 +303,12 @@ function compile {
         make -j8 MAKEINFO=true  >> configure.log
     fi
 
-    if [[ $name == "gcc" && $target == "x86_64-elf" ]]; then
+    if [[ $name == "gcc" ]]; then
+    if [[ $target == "x86_64-elf" ]]; then
         make -j8 all-target-libgcc CFLAGS_FOR_TARGET='-g -O2 -mcmodel=large -mno-red-zone' MAKEINFO=true >> make.log
     else
         make -j8 all-target-libgcc MAKEINFO=true >> make.log
+    fi
     fi
 
     if [[ $name == "gcc" ]]; then
