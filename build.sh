@@ -51,8 +51,7 @@ function main {
 function installPackagesMac {
 #    brew update
 #    brew upgrade
-#    brew install --force coreutils bzip2 flex gperf intltool gdk-pixbuf pcre openssl libtool lzip make p7zip gnu-sed unzip libmpc isl gmp mpfr guile expat zlib gawk gzip
-    brew install gsed expat guile
+    brew install gsed expat guile gmp mpfr mpc
 }
 
 function installPackages {
@@ -196,7 +195,7 @@ function compile {
     fi
 
     if [[ $platform == "macos" && $name == "gdb" ]]; then
-        configureArgs="--with-expat=/opt/homebrew/opt/expat --with-gmp=/opt/homebrew --with-mpfr=/opt/homebrew --with-mpc=/opt/homebrew $configureArgs"
+        configureArgs="--with-guile=/usr/local --with-expat=/usr/local/opt/expat --with-gmp=/usr/local --with-mpfr=/usr/local --with-mpc=/usr/local $configureArgs"
     fi
 
     if [ $platform == "windows" ]; then
