@@ -42,8 +42,8 @@ function main {
         compileAll "macos" $BUILD_TARGET
     else
         compileAll "linux" $BUILD_TARGET
-        #installMXE
-        #compileAll "windows" $BUILD_TARGET
+        installMXE
+        compileAll "windows" $BUILD_TARGET
     fi
     echo -e "\e[92mZipped everything to $HOME/${BUILD_TARGET}-tools-[windows | linux | macos].zip\e[39m"
 }
@@ -60,6 +60,44 @@ function installPackages {
     sudo apt-get upgrade -y
     #Sphinx diffutils (py mod) gm2 gdc gnat python
     sudo -E DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential gawk bash gcc g++ binutils gzip bzip2 make tar perl libdebuginfod-dev liblzma-dev zlib1g-dev libipt-dev libbabeltrace-dev libc6-dev libgmp-dev libmpfr-dev libmpc-dev libisl-dev zstd gettext texinfo autoconf automake autogen guile-3.0-dev flex git ssh patch tcl expect dejagnu m4
+    sudo apt-get install \
+    autoconf \
+    automake \
+    autopoint \
+    bash \
+    bison \
+    bzip2 \
+    flex \
+    g++ \
+    g++-multilib \
+    gettext \
+    git \
+    gperf \
+    intltool \
+    libc6-dev-i386 \
+    libgdk-pixbuf2.0-dev \
+    libltdl-dev \
+    libgl-dev \
+    libpcre3-dev \
+    libssl-dev \
+    libtool-bin \
+    libxml-parser-perl \
+    lzip \
+    make \
+    openssl \
+    p7zip-full \
+    patch \
+    perl \
+    python3 \
+    python3-distutils \
+    python3-mako \
+    python3-pkg-resources \
+    python-is-python3 \
+    ruby \
+    sed \
+    unzip \
+    wget \
+    xz-utils
 }
 
 function installMXE {
