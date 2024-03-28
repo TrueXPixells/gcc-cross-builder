@@ -21,6 +21,8 @@ case $key in
 esac
 done
 
+sudo apt-get install -y 
+
 mkdir work
 cd work
 
@@ -35,7 +37,7 @@ curl -LO https://ftp.gnu.org/gnu/binutils/binutils-$BINUTILS_VERSION.tar.xz
 mkdir binutils-src binutils-build
 
 cd binutils-src
-tar -xvf ../binutils-$BINUTILS_VERSION.tar.xz
+tar -xvf ../binutils-$BINUTILS_VERSION.tar.xz --strip-components=1
 cd ..
 
 cd binutils-build
@@ -49,7 +51,7 @@ curl -LO https://ftp.gnu.org/gnu/gcc/gcc-$GCC_VERSION/gcc-$GCC_VERSION.tar.xz
 mkdir gcc-src gcc-build
 
 cd gcc-src
-tar -xvf ../gcc-$GCC_VERSION.tar.xz
+tar -xvf ../gcc-$GCC_VERSION.tar.xz --strip-components=1
 
 if [ $BUILD_TARGET == "x86_64-elf" ]; then
     echo -e "MULTILIB_OPTIONS += mno-red-zone\nMULTILIB_DIRNAMES += no-red-zone" > ./gcc/config/i386/t-x86_64-elf
@@ -80,7 +82,7 @@ curl -LO https://ftp.gnu.org/gnu/gdb/gdb-$GDB_VERSION.tar.xz
 mkdir gdb-src gdb-build
 
 cd gdb-src
-tar -xvf ../gdb-$GDB_VERSION.tar.xz
+tar -xvf ../gdb-$GDB_VERSION.tar.xz --strip-components=1
 cd ..
 
 cd gdb-build
