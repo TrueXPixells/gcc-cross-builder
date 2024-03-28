@@ -12,17 +12,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [x86_64-elf, i386-elf, i686-elf, riscv64-elf, arm-none-eabi, avr]
-        platform: [ubuntu-latest, macos-13]
+        arch: [x86_64-elf]
+        platform: [windows, linux]
     name: ${{ matrix.arch }}
-    runs-on: ${{ matrix.platform }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Build
         run: |                  
           cd $GITHUB_WORKSPACE 
           chmod +x build.sh
-          ./build.sh -t "${{ matrix.arch }}"
+          ./build.sh -t "${{ matrix.arch }}" -p "${{ matrix.platform }}" --tar-path="$GITHUB_WORKSPACE"
       - name: release linux
         uses: actions/upload-release-asset@v1
         if: ${{ matrix.platform == 'ubuntu-latest' }}
